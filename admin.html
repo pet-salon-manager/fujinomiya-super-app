@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a5b46" />
+  <title>管理者 | 富士宮まるごと</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body class="admin-body">
+  <main class="admin-shell">
+    <header class="admin-topbar">
+      <div>
+        <span class="eyebrow">FUJINOMIYA ONE ADMIN</span>
+        <h1>施設データ管理</h1>
+      </div>
+      <a class="back-home" href="index.html">← アプリへ戻る</a>
+    </header>
+
+    <section id="setupNotice" class="notice" hidden>
+      <strong>Supabaseが未接続です。</strong>
+      <p><code>config.js</code> に Project URL と Publishable/anon key を設定してください。設定手順は同梱の <code>SUPABASE_SETUP.md</code> にあります。</p>
+    </section>
+
+    <section id="loginPanel" class="admin-card login-card">
+      <h2>管理者ログイン</h2>
+      <p>Supabase Auth に登録した管理者メールアドレスでログインします。</p>
+      <form id="loginForm" class="form-stack">
+        <label>メールアドレス<input id="loginEmail" type="email" autocomplete="username" required></label>
+        <label>パスワード<input id="loginPassword" type="password" autocomplete="current-password" required></label>
+        <button class="admin-primary" type="submit">ログイン</button>
+      </form>
+      <div id="loginStatus" class="admin-status" role="status"></div>
+    </section>
+
+    <section id="adminPanel" hidden>
+      <div class="admin-toolbar admin-card">
+        <div>
+          <strong id="signedInAs">管理者</strong>
+          <span id="dbStatus">Supabase接続中</span>
+        </div>
+        <div class="toolbar-actions">
+          <button id="newPlaceButton" type="button">＋ 新規追加</button>
+          <button id="reloadButton" type="button">↻ 再読込</button>
+          <button id="logoutButton" type="button">ログアウト</button>
+        </div>
+      </div>
+
+      <div class="admin-layout">
+        <section class="admin-card admin-list-panel">
+          <div class="admin-list-head">
+            <div>
+              <span class="eyebrow">PLACES</span>
+              <h2>登録情報</h2>
+            </div>
+            <span id="adminCount" class="count-badge">0件</span>
+          </div>
+          <input id="adminSearch" class="admin-search" type="search" placeholder="名称・住所・カテゴリで検索">
+          <div id="adminList" class="admin-list"></div>
+        </section>
+
+        <section class="admin-card editor-panel">
+          <div class="editor-head">
+            <div>
+              <span class="eyebrow">EDITOR</span>
+              <h2 id="editorTitle">新規施設</h2>
+            </div>
+            <span id="saveStatus" class="admin-status"></span>
+          </div>
+
+          <form id="placeForm" class="editor-form">
+            <input id="placeId" type="hidden">
+            <div class="form-grid two">
+              <label>名称 *<input id="placeName" required></label>
+              <label>カテゴリ *
+                <select id="placeCategory" required>
+                  <option value="food">食べる</option><option value="sightseeing">遊ぶ・観光</option>
+                  <option value="shopping">買う</option><option value="stay">泊まる</option>
+                  <option value="mobility">移動する</option><option value="life">暮らす</option>
+                  <option value="kids">子育て・教育</option><option value="government">行政・手続き</option>
+                  <option value="work">仕事・ビジネス</option><option value="safety">防災・緊急</option>
+                  <option value="events">イベント</option><option value="community">お得・地域交流</option>
+                </select>
+              </label>
+            </div>
+            <div class="form-grid two">
+              <label>種類
+                <select id="placeKind"><option value="place">施設・場所</option><option value="service">案内・サービス</option></select>
+              </label>
+              <label>公開状態
+                <select id="placePublished"><option value="true">公開</option><option value="false">非公開</option></select>
+              </label>
+            </div>
+            <label>住所<input id="placeAddress"></label>
+            <div class="form-grid two">
+              <label>電話番号<input id="placePhone" inputmode="tel"></label>
+              <label>公式HP / 公式SNS<input id="placeSite" type="url" placeholder="https://..."></label>
+            </div>
+            <label>説明<textarea id="placeDescription" rows="4"></textarea></label>
+            <label>検索タグ <small>カンマ区切り</small><input id="placeTags" placeholder="富士山, 観光, カフェ"></label>
+            <div class="form-grid two">
+              <label>緯度<input id="placeLat" type="number" step="any" placeholder="35.000000"></label>
+              <label>経度<input id="placeLng" type="number" step="any" placeholder="138.000000"></label>
+            </div>
+            <div class="form-grid two">
+              <label>情報元<input id="placeSource" placeholder="公式サイト"></label>
+              <label>並び順<input id="placeSortOrder" type="number" step="1" value="100"></label>
+            </div>
+            <div class="editor-actions">
+              <button class="admin-primary" type="submit">保存</button>
+              <button id="clearButton" type="button">入力をクリア</button>
+              <button id="deleteButton" class="danger" type="button" hidden>削除</button>
+            </div>
+          </form>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

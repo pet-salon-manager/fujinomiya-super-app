@@ -14,7 +14,8 @@ const categories = [
 ];
 
 const dataPack = window.FUJINOMIYA_DATA || {version:'0', updatedAt:'', note:'', places:[]};
-const places = dataPack.places || [];
+let places = [...(dataPack.places || [])];
+let dataSource = '内蔵データ';
 
 const modePriority = {
   resident:['life','shopping','government','safety','kids','mobility','events','food','work','community','sightseeing','stay'],
@@ -53,6 +54,49 @@ function isConcreteAddress(place){
   return place.address && place.address !== '富士宮市' && place.address !== '静岡県富士宮市';
 }
 
+function mapDbRow(row){
+  return {
+    id:String(row.id),
+    name:row.name || '',
+    category:row.category || 'life',
+    kind:row.kind || 'place',
+    address:row.address || '',
+    phone:row.phone || '',
+    site:row.site || '',
+    desc:row.description || '',
+    tags:Array.isArray(row.tags) ? row.tags : [],
+    lat:row.lat == null ? null : Number(row.lat),
+    lng:row.lng == null ? null : Number(row.lng),
+    source:row.source || ''
+  };
+}
+
+async function loadRemotePlaces(){
+  const db = window.FM_DB;
+  if(!db?.configured || !db.client){
+    dataSource='内蔵データ';
+    return;
+  }
+  try{
+    const {data,error}=await db.client
+      .from('places')
+      .select('id,name,category,kind,address,phone,site,description,tags,lat,lng,source,sort_order,is_published')
+      .eq('is_published',true)
+      .order('sort_order',{ascending:true})
+      .order('name',{ascending:true});
+    if(error) throw error;
+    if(Array.isArray(data)){
+      places=data.map(mapDbRow);
+      dataSource='Supabase';
+      statusEl.textContent='最新の施設データを読み込みました。';
+    }
+  }catch(err){
+    console.error('Supabase load failed',err);
+    dataSource='内蔵データ（Supabase接続失敗）';
+    statusEl.textContent='クラウドデータを取得できなかったため、内蔵データを表示しています。';
+  }
+}
+
 function mapSearchUrl(place){
   if(hasCoords(place)){
     return `https://www.openstreetmap.org/?mlat=${place.lat}&mlon=${place.lng}#map=16/${place.lat}/${place.lng}`;
@@ -61,23 +105,26 @@ function mapSearchUrl(place){
   return `https://www.openstreetmap.org/search?query=${q}`;
 }
 
-categories.forEach(cat=>{
-  const btn=document.createElement('button');
-  btn.className='category-card';
-  btn.type='button';
-  btn.dataset.id=cat.id;
-  const count=places.filter(p=>p.category===cat.id).length;
-  btn.innerHTML=`<span class="icon">${cat.icon}</span><span class="name">${cat.name}</span><span class="cat-count">${count}件</span>`;
-  btn.addEventListener('click',()=>{
-    activeCategory = activeCategory===cat.id ? null : cat.id;
-    showFavoritesOnly=false;
-    favoritesButton.classList.remove('active');
-    syncCategoryState();
-    applyFilters();
-    document.getElementById('resultsSection').scrollIntoView({behavior:'smooth',block:'start'});
+function renderCategories(){
+  grid.innerHTML='';
+  categories.forEach(cat=>{
+    const btn=document.createElement('button');
+    btn.className='category-card';
+    btn.type='button';
+    btn.dataset.id=cat.id;
+    const count=places.filter(p=>p.category===cat.id).length;
+    btn.innerHTML=`<span class="icon">${cat.icon}</span><span class="name">${cat.name}</span><span class="cat-count">${count}件</span>`;
+    btn.addEventListener('click',()=>{
+      activeCategory = activeCategory===cat.id ? null : cat.id;
+      showFavoritesOnly=false;
+      favoritesButton.classList.remove('active');
+      syncCategoryState();
+      applyFilters();
+      document.getElementById('resultsSection').scrollIntoView({behavior:'smooth',block:'start'});
+    });
+    grid.appendChild(btn);
   });
-  grid.appendChild(btn);
-});
+}
 
 function renderDataSummary(){
   const pinCount=places.filter(hasCoords).length;
@@ -87,8 +134,9 @@ function renderDataSummary(){
     <span><strong>${realPlaces}</strong> 施設・場所</span>
     <span><strong>${pinCount}</strong> 確認済み地図ピン</span>
     <span><strong>${categories.length}</strong> カテゴリ</span>
+    <span class="source-badge"><strong>DB</strong> ${dataSource}</span>
   `;
-  summaryEl.title=dataPack.note || '';
+  summaryEl.title=dataSource==='Supabase'?'Supabaseから公開中データを取得しています。':(dataPack.note || '');
 }
 
 function syncCategoryState(){
@@ -319,6 +367,12 @@ document.querySelectorAll('.bottom-nav [data-target]').forEach(btn=>btn.addEvent
   if(btn.dataset.target==='mapSection') setTimeout(()=>map.invalidateSize(),400);
 }));
 
-renderDataSummary();
-updateModeUI();
-applyFilters();
+async function boot(){
+  updateModeUI();
+  await loadRemotePlaces();
+  renderCategories();
+  renderDataSummary();
+  applyFilters();
+}
+
+boot();

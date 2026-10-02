@@ -1,22 +1,14 @@
-富士宮まるごと / FUJINOMIYA ONE - v3
+富士宮まるごと / FUJINOMIYA ONE - v4
 
-第3段階
-- 実データを data.js に分離
-- 12カテゴリ横断検索
-- 市民 / 観光モード
-- お気に入り保存
-- 現在地から距離順
-- OpenStreetMap
-- 住所は判明しているが緯度経度未確認の施設に推測ピンを置かない
-- 電話 / Web / 住所検索
-- 情報元・検索タグ表示
-- Supabaseへ移行しやすいデータ構造
+第4段階
+- Supabase接続対応
+- 未接続・接続失敗時はdata.jsへ自動フォールバック
+- Supabase Auth 管理者ログイン
+- 管理画面 admin.html
+- 施設の追加 / 修正 / 削除
+- 公開 / 非公開
+- 名称 / カテゴリ / 種類 / 住所 / 電話 / 公式HP / 説明 / タグ / 緯度経度 / 情報元 / 並び順
+- Row Level Security (RLS) 対応
+- service_role key をブラウザに置かない安全構成
 
-GitHub Pages更新方法
-既存リポジトリ直下へ以下4ファイルをアップロードして置き換えてください。
-index.html
-styles.css
-app.js
-data.js
-
-README.txt は任意です。
+最初に SUPABASE_SETUP.md を読んでください。

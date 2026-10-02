@@ -1,0 +1,43 @@
+-- v3内蔵データをSupabaseへ初期投入します。
+-- schema.sql 実行後にSupabase SQL Editorで実行してください。
+
+insert into public.places (id,name,category,kind,address,phone,site,description,tags,lat,lng,source,is_published,sort_order) values
+  ('sengen','富士山本宮浅間大社','sightseeing','place','静岡県富士宮市宮町1-1',null,'https://fuji-hongu.or.jp/sengen/','富士宮を代表する観光・文化スポット。市街地散策の起点にも使いやすい場所です。',ARRAY['神社','富士山','歴史','観光']::text[],35.2274,138.6104,'公式サイト',true,100),
+  ('whc','静岡県富士山世界遺産センター','sightseeing','place','静岡県富士宮市宮町5-12','0544-21-3776',null,'富士山の自然・文化・信仰を学べる施設。観光前の情報収集にも便利です。',ARRAY['富士山','世界遺産','展示','学ぶ']::text[],35.2268,138.6077,'登録済み情報',true,101),
+  ('shiraito','白糸ノ滝','sightseeing','place','静岡県富士宮市上井出273-1',null,null,'富士山の湧水が流れ落ちる富士宮の代表的な景勝地です。',ARRAY['滝','自然','世界遺産','絶景']::text[],35.3122,138.5888,'登録済み情報',true,102),
+  ('karijuku','井出の代官屋敷（狩宿の下馬ザクラ）','sightseeing','place','静岡県富士宮市狩宿91','0544-27-5240',null,'狩宿地区の歴史と景観に触れられる観光スポット。春の散策先としても知られます。',ARRAY['歴史','桜','散策']::text[],null,null,'登録済み情報',true,103),
+  ('oshikakubo','大鹿窪遺跡','sightseeing','place','静岡県富士宮市大鹿窪454',null,null,'富士宮市内の歴史を知ることができる遺跡。地域の文化・歴史学習にも使えるスポットです。',ARRAY['遺跡','歴史','文化']::text[],null,null,'登録済み情報',true,104),
+  ('tourism-assoc','富士宮市観光協会','sightseeing','service','静岡県富士宮市','0544-27-5240','https://fujinomiya.gr.jp/','富士宮市内の観光・イベント・施設情報を確認できる観光案内の窓口です。',ARRAY['観光案内','イベント','公式情報']::text[],null,null,'富士宮市観光協会',true,105),
+  ('dada','Cafe & Restaurant DADA PLUS','food','place','静岡県富士宮市大宮町4-5','0544-23-1385','https://www.1cho-me.jp/dada-plus/','富士宮市街地で食事やカフェ利用ができるレストラン。',ARRAY['カフェ','レストラン','市街地']::text[],35.2267,138.6115,'公式サイト',true,106),
+  ('roku','Roku cafe','food','place','静岡県富士宮市宮町14-3','0544-66-9775','https://www.instagram.com/roku_cafe_/','浅間大社周辺の散策と組み合わせやすいカフェ。',ARRAY['カフェ','浅間大社周辺']::text[],35.229,138.6098,'公式SNS',true,107),
+  ('mochiwa','海鮮料理もちわ','food','place','静岡県富士宮市安居山703-20','0544-23-0296','https://mochiwa.net/','海鮮料理を楽しめる地元店。',ARRAY['海鮮','和食','地元店']::text[],35.216,138.5817,'公式サイト',true,108),
+  ('buffet','ビュッフェレストランふじさん','food','place','静岡県富士宮市根原449-11','0544-29-5501','https://www.buffet-restaurant-fujisan.com/','朝霧高原エリアで立ち寄りやすいビュッフェレストラン。',ARRAY['ビュッフェ','朝霧高原','レストラン']::text[],35.4132,138.5737,'公式サイト',true,109),
+  ('chubosaka','炭火やき 厨保さか','food','place','静岡県富士宮市西小泉町18-18','0544-25-2662','https://www.instagram.com/tororo1803/?hl=ja','炭火料理を楽しめる富士宮市内の飲食店。',ARRAY['炭火料理','地元店']::text[],null,null,'公式SNS',true,110),
+  ('lemon','レモン','food','place','静岡県富士宮市ひばりが丘240','0544-24-8204',null,'富士宮市内のカフェ・喫茶店。',ARRAY['カフェ','喫茶']::text[],null,null,'登録済み情報',true,111),
+  ('wazo','スペース ワゾウ','food','place','静岡県富士宮市野中855-1','0544-27-7160','https://spacewazo.com','富士宮市野中にある飲食・交流スポット。',ARRAY['カフェ','交流','地元店']::text[],null,null,'公式サイト',true,112),
+  ('noncafe','のんカフェ','food','place','静岡県富士宮市朝日町8-25','090-6591-0507',null,'朝日町にある地元カフェ。',ARRAY['カフェ','地元店']::text[],null,null,'登録済み情報',true,113),
+  ('qkamura-fuji','休暇村富士','stay','place','静岡県富士宮市佐折634','0544-54-5200','https://www.qkamura.or.jp/fuji/','田貫湖周辺で富士山の自然を楽しめる宿泊施設。',ARRAY['宿泊','田貫湖','富士山']::text[],null,null,'公式サイト',true,114),
+  ('stay-hub','富士宮市内の宿泊施設を探す','stay','service','富士宮市','0544-27-5240','https://fujinomiya.gr.jp/','市内の旅館・ホテル・民宿・キャンプ場などを観光協会情報から探す入口です。',ARRAY['宿泊','ホテル','旅館','キャンプ']::text[],null,null,'富士宮市観光協会',true,115),
+  ('station','富士宮駅','mobility','place','静岡県富士宮市中央町16',null,null,'JR身延線の主要駅。市街地観光やバス・タクシー利用の拠点です。',ARRAY['鉄道','駅','JR','交通']::text[],35.2219,138.6148,'登録済み情報',true,116),
+  ('taxi-hub','富士宮市内タクシー案内','mobility','service','富士宮市',null,null,'市内のタクシー会社を現在地から近い順に案内する機能をこの項目へ統合予定です。',ARRAY['タクシー','配車','移動']::text[],null,null,'アプリ機能',true,117),
+  ('route-hub','鉄道・バス・移動案内','mobility','service','富士宮市',null,null,'鉄道駅、バス停、駐車場、ガソリン、EV充電など移動関連情報の入口です。',ARRAY['鉄道','バス','駐車場','ガソリン','EV']::text[],null,null,'アプリ機能',true,118),
+  ('roadstation-asagiri','道の駅 朝霧高原','shopping','place','静岡県富士宮市根原字宝山492-14','0544-52-2230',null,'朝霧高原エリアの休憩・買い物拠点。地域の特産品探しにも使えます。',ARRAY['道の駅','特産品','買い物','朝霧高原']::text[],null,null,'登録済み情報',true,119),
+  ('shopping-hub','富士宮の買い物・特産品','shopping','service','富士宮市',null,'https://fujinomiya.gr.jp/','土産、特産品、直売所、地域商店などをまとめて探す入口です。',ARRAY['買い物','土産','特産品','直売所']::text[],null,null,'富士宮市観光協会',true,120),
+  ('cityhall','富士宮市役所','government','place','静岡県富士宮市弓沢町150','0544-22-1111','https://www.city.fujinomiya.lg.jp/','各種行政手続き、生活情報、相談窓口の中心施設。',ARRAY['市役所','行政','手続き']::text[],35.222,138.6213,'富士宮市公式',true,121),
+  ('tourism-section','富士宮市 観光課','government','service','静岡県富士宮市弓沢町150','0544-22-1155','https://www.city.fujinomiya.lg.jp/','富士宮市の観光行政・観光情報に関する窓口です。',ARRAY['観光','行政','問い合わせ']::text[],35.222,138.6213,'富士宮市公式',true,122),
+  ('heritage-section','富士山世界遺産課 企画係','government','service','静岡県富士宮市弓沢町150','0544-22-1489','https://www.city.fujinomiya.lg.jp/','富士山世界遺産に関する市の窓口。',ARRAY['世界遺産','富士山','行政']::text[],35.222,138.6213,'富士宮市公式',true,123),
+  ('library','富士宮市立中央図書館','kids','place','静岡県富士宮市宮町13-1','0544-26-5062',null,'学習や子どもの読書、地域情報収集に使える公共施設。',ARRAY['図書館','子ども','学習']::text[],35.2293,138.6109,'登録済み情報',true,124),
+  ('kids-hub','富士宮市 子育て・教育情報','kids','service','富士宮市','0544-22-1111','https://www.city.fujinomiya.lg.jp/','子育て支援、保育、学校、手続きなどの市公式情報へつながる入口です。',ARRAY['子育て','保育','学校','教育']::text[],null,null,'富士宮市公式',true,125),
+  ('life-hub','富士宮市 医療・暮らし情報','life','service','富士宮市','0544-22-1111','https://www.city.fujinomiya.lg.jp/','病院、健康、福祉、生活相談など、市民向け情報をまとめる入口です。',ARRAY['病院','医療','健康','福祉','暮らし']::text[],null,null,'富士宮市公式',true,126),
+  ('pet-life-hub','ペット・動物病院情報','life','service','富士宮市',null,null,'市内の動物病院、ペット関連施設、ペット同伴可施設をまとめる機能を統合予定です。',ARRAY['ペット','動物病院','犬','猫']::text[],null,null,'アプリ機能',true,127),
+  ('emergency-fire','救急・火災 119','safety','service','富士宮市','119',null,'救急車・消防車が必要な緊急時の連絡先です。',ARRAY['救急','火災','消防','緊急']::text[],null,null,'緊急連絡先',true,128),
+  ('emergency-police','警察 110','safety','service','富士宮市','110',null,'事件・事故など緊急時の警察への連絡先です。',ARRAY['警察','事故','事件','緊急']::text[],null,null,'緊急連絡先',true,129),
+  ('disaster-hub','富士宮市 防災情報','safety','service','富士宮市','0544-22-1111','https://www.city.fujinomiya.lg.jp/','避難所、災害、ハザード情報などを確認するための市公式情報入口です。',ARRAY['防災','避難所','災害','ハザード']::text[],null,null,'富士宮市公式',true,130),
+  ('hall','富士宮市民文化会館','events','place','静岡県富士宮市宮町14-2','0544-23-1237',null,'コンサートや地域イベントなどが行われる文化施設。',ARRAY['イベント','文化','コンサート']::text[],35.2294,138.6094,'登録済み情報',true,131),
+  ('events-hub','富士宮市 イベント情報','events','service','富士宮市',null,'https://fujinomiya.gr.jp/','祭り、マルシェ、観光イベントなどを確認する入口です。',ARRAY['イベント','祭り','マルシェ']::text[],null,null,'富士宮市観光協会',true,132),
+  ('work','富士宮市 仕事・事業者向け情報','work','service','富士宮市','0544-22-1111','https://www.city.fujinomiya.lg.jp/','地元企業、雇用、創業支援、事業者向け制度などをまとめる入口です。',ARRAY['求人','仕事','創業','事業者']::text[],null,null,'富士宮市公式',true,133),
+  ('community','富士宮クーポン・スタンプ','community','service','富士宮市',null,null,'地域クーポン、デジタルスタンプ、店舗情報、地域交流機能をここに統合します。',ARRAY['クーポン','スタンプ','地域交流']::text[],null,null,'アプリ機能',true,134),
+  ('talk','富士宮トーク','community','service','富士宮市',null,null,'友達・店舗とのトーク、集合場所、営業時間や空席確認などをまとめるコミュニケーション機能です。',ARRAY['トーク','友達','店舗','QR']::text[],null,null,'アプリ機能',true,135)
+on conflict (id) do update set
+  name=excluded.name, category=excluded.category, kind=excluded.kind, address=excluded.address, phone=excluded.phone, site=excluded.site,
+  description=excluded.description, tags=excluded.tags, lat=excluded.lat, lng=excluded.lng, source=excluded.source, is_published=excluded.is_published, sort_order=excluded.sort_order;

@@ -144,3 +144,9 @@ footer{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;color:
   .data-summary span{font-size:10px;padding:5px 7px}
   .cat-count{right:7px;top:7px;font-size:8px}
 }
+
+/* v4: Supabase / admin link */
+.admin-link{color:var(--green);font-weight:900;text-decoration:none;margin-left:8px}
+.admin-link:hover{text-decoration:underline}
+.data-summary .source-badge{background:#e9f5ff;border-color:#cfe8f7;color:#2d637f}
+.data-summary .source-badge strong{color:#2d637f}
