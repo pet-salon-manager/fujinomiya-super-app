@@ -131,15 +131,47 @@ $('loginForm').addEventListener('submit',async e=>{
 $('placeForm').addEventListener('submit',async e=>{
   e.preventDefault();
   const payload=payloadFromForm();
-  if(!payload.name){setStatus(saveStatus,'名称を入力してください。','error');return;}
-  if((payload.lat==null)!==(payload.lng==null)){setStatus(saveStatus,'緯度と経度は両方入力するか、両方空欄にしてください。','error');return;}
+  const saveButton=e.submitter || e.currentTarget.querySelector('button[type=\"submit\"]');
+
+  if(!payload.name){
+    setStatus(saveStatus,'名称を入力してください。','error');
+    saveStatus.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  if((payload.lat==null)!==(payload.lng==null)){
+    setStatus(saveStatus,'緯度と経度は両方入力するか、両方空欄にしてください。','error');
+    saveStatus.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+
+  const originalText=saveButton?.textContent || '保存';
+  if(saveButton){ saveButton.disabled=true; saveButton.textContent='保存中…'; }
   setStatus(saveStatus,'保存中…');
-  const {error}=await db.client.from('places').upsert(payload,{onConflict:'id'});
-  if(error){setStatus(saveStatus,error.message,'error');return;}
-  activeId=payload.id;
-  setStatus(saveStatus,'保存しました','ok');
-  await loadRows();
-  editRow(payload.id);
+
+  try{
+    const {error}=await db.client.from('places').upsert(payload,{onConflict:'id'});
+    if(error) throw error;
+
+    activeId=payload.id;
+    const {data,error:reloadError}=await db.client
+      .from('places')
+      .select('*')
+      .order('sort_order',{ascending:true})
+      .order('name',{ascending:true});
+    if(reloadError) throw reloadError;
+
+    rows=(data||[]).map(normalizeRow);
+    renderList();
+    editRow(payload.id);
+    setStatus(saveStatus,'✓ 保存しました','ok');
+    saveStatus.scrollIntoView({behavior:'smooth',block:'center'});
+  }catch(err){
+    console.error('Save failed',err);
+    setStatus(saveStatus,`保存できませんでした: ${err.message || err}`,'error');
+    saveStatus.scrollIntoView({behavior:'smooth',block:'center'});
+  }finally{
+    if(saveButton){ saveButton.disabled=false; saveButton.textContent=originalText; }
+  }
 });
 
 $('deleteButton').addEventListener('click',async()=>{
