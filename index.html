@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a5b46" />
+  <title>富士宮まるごと | FUJINOMIYA ONE</title>
+  <link rel="preconnect" href="https://unpkg.com" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">FUJINOMIYA ONE</div>
+        <h1>富士宮まるごと</h1>
+      </div>
+      <button class="icon-btn" id="modeButton" aria-label="表示モード切り替え">市民</button>
+    </header>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="hero-kicker">観光も、暮らしも、これひとつ。</p>
+        <h2>富士宮市の「知りたい・行きたい・使いたい」をまとめて検索</h2>
+        <p>グルメ、観光、買い物、医療、行政、防災、交通まで横断して探せます。</p>
+      </div>
+      <div class="mountain" aria-hidden="true"></div>
+    </section>
+
+    <section class="search-panel">
+      <div class="search-row">
+        <input id="globalSearch" type="search" placeholder="例：富士宮焼きそば、病院、温泉、駐車場" autocomplete="off" />
+        <button id="searchButton" class="primary-btn">検索</button>
+      </div>
+      <div class="quick-actions">
+        <button id="nearbyButton" class="secondary-btn">📍 現在地から探す</button>
+        <button id="showAllButton" class="secondary-btn">すべて表示</button>
+      </div>
+      <div id="statusMessage" class="status" role="status"></div>
+    </section>
+
+    <nav class="category-grid" id="categoryGrid" aria-label="カテゴリー"></nav>
+
+    <section class="content-grid">
+      <section class="results-panel">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">SEARCH RESULTS</span>
+            <h3 id="resultsTitle">おすすめ・新着</h3>
+          </div>
+          <span class="count-badge" id="resultCount">0件</span>
+        </div>
+        <div id="cards" class="cards"></div>
+      </section>
+
+      <aside class="map-panel">
+        <div class="section-head compact">
+          <div>
+            <span class="eyebrow">MAP</span>
+            <h3>富士宮マップ</h3>
+          </div>
+          <button id="mapLocateButton" class="mini-btn">現在地</button>
+        </div>
+        <div id="map"></div>
+        <p class="map-note">OpenStreetMapを使用。現在地は端末の位置情報許可が必要です。</p>
+      </aside>
+    </section>
+
+    <footer>
+      <strong>富士宮まるごと</strong>
+      <span>第1段階プロトタイプ — 観光・生活・地域情報をひとつに</span>
+    </footer>
+  </div>
+
+  <template id="cardTemplate">
+    <article class="place-card">
+      <div class="card-topline">
+        <span class="category-pill"></span>
+        <span class="distance"></span>
+      </div>
+      <h4></h4>
+      <p class="description"></p>
+      <div class="meta"></div>
+      <div class="card-actions">
+        <button class="map-btn">地図で見る</button>
+        <a class="route-btn" target="_blank" rel="noopener">現在地からの行き方</a>
+      </div>
+    </article>
+  </template>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="app.js"></script>
+</body>
+</html>
