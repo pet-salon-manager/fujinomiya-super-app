@@ -47,6 +47,7 @@
           <button id="showAllButton" class="secondary-btn" type="button">すべて表示</button>
         </div>
         <div id="statusMessage" class="status" role="status" aria-live="polite"></div>
+        <div class="data-summary" id="dataSummary" aria-label="登録データ概要"></div>
       </section>
 
       <section class="mode-strip" aria-label="おすすめ切り替え">
@@ -120,6 +121,8 @@
       <h3></h3>
       <p class="description"></p>
       <div class="meta"></div>
+      <div class="tags"></div>
+      <div class="source-row"><span class="source-label"></span></div>
       <div class="contact-actions"></div>
       <div class="card-actions">
         <button class="map-btn" type="button">地図で見る</button>
@@ -129,6 +132,7 @@
   </template>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="data.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

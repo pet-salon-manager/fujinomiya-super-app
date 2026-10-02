@@ -13,25 +13,8 @@ const categories = [
   {id:'community', icon:'🎟️', name:'お得・地域交流'}
 ];
 
-const places = [
-  {id:'sengen',name:'富士山本宮浅間大社',category:'sightseeing',address:'静岡県富士宮市宮町1-1',phone:'',site:'https://fuji-hongu.or.jp/sengen/',desc:'富士宮を代表する観光・文化スポット。市街地散策の起点にも使いやすい場所です。',lat:35.2274,lng:138.6104},
-  {id:'whc',name:'静岡県富士山世界遺産センター',category:'sightseeing',address:'静岡県富士宮市宮町5-12',phone:'0544-21-3776',site:'',desc:'富士山の自然・文化・信仰を学べる施設。観光前の情報収集にも便利です。',lat:35.2268,lng:138.6077},
-  {id:'shiraito',name:'白糸ノ滝',category:'sightseeing',address:'静岡県富士宮市上井出273-1',phone:'',site:'',desc:'富士山の湧水が流れ落ちる富士宮の代表的な景勝地です。',lat:35.3122,lng:138.5888},
-  {id:'dada',name:'Cafe & Restaurant DADA PLUS',category:'food',address:'静岡県富士宮市大宮町4-5',phone:'0544-23-1385',site:'https://www.1cho-me.jp/dada-plus/',desc:'富士宮市街地で食事やカフェ利用ができるレストラン。',lat:35.2267,lng:138.6115},
-  {id:'roku',name:'Roku cafe',category:'food',address:'静岡県富士宮市宮町14-3',phone:'0544-66-9775',site:'https://www.instagram.com/roku_cafe_/',desc:'浅間大社周辺の散策と組み合わせやすいカフェ。',lat:35.2290,lng:138.6098},
-  {id:'mochiwa',name:'海鮮料理もちわ',category:'food',address:'静岡県富士宮市安居山703-20',phone:'0544-23-0296',site:'https://mochiwa.net/',desc:'海鮮料理を楽しめる地元店。',lat:35.2160,lng:138.5817},
-  {id:'buffet',name:'ビュッフェレストランふじさん',category:'food',address:'静岡県富士宮市根原449-11',phone:'0544-29-5501',site:'https://www.buffet-restaurant-fujisan.com/',desc:'朝霧高原エリアで立ち寄りやすいビュッフェレストラン。',lat:35.4132,lng:138.5737},
-  {id:'cityhall',name:'富士宮市役所',category:'government',address:'静岡県富士宮市弓沢町150',phone:'0544-22-1111',site:'https://www.city.fujinomiya.lg.jp/',desc:'各種行政手続き、生活情報、相談窓口の中心施設。',lat:35.2220,lng:138.6213},
-  {id:'station',name:'富士宮駅',category:'mobility',address:'静岡県富士宮市中央町16',phone:'',site:'',desc:'JR身延線の主要駅。市街地観光やバス・タクシー利用の拠点です。',lat:35.2219,lng:138.6148},
-  {id:'library',name:'富士宮市立中央図書館',category:'kids',address:'静岡県富士宮市宮町13-1',phone:'0544-26-5062',site:'',desc:'学習や子どもの読書、地域情報収集に使える公共施設。',lat:35.2293,lng:138.6109},
-  {id:'hall',name:'富士宮市民文化会館',category:'events',address:'静岡県富士宮市宮町14-2',phone:'0544-23-1237',site:'',desc:'コンサートや地域イベントなどが行われる文化施設。',lat:35.2294,lng:138.6094},
-  {id:'emergency',name:'富士宮市 救急・防災',category:'safety',address:'富士宮市',phone:'119',site:'https://www.city.fujinomiya.lg.jp/',desc:'緊急時は119。今後、避難所・AED・災害情報を現在地と連動して表示します。',lat:35.2220,lng:138.6213},
-  {id:'work',name:'富士宮市 地域求人・事業者情報',category:'work',address:'富士宮市',phone:'',site:'',desc:'今後、地元企業の求人、創業支援、空き店舗、事業者向け情報をまとめます。',lat:35.2220,lng:138.6213},
-  {id:'shopping',name:'富士宮市内 買い物情報',category:'shopping',address:'富士宮市',phone:'',site:'',desc:'スーパー、直売所、土産店、ドラッグストアなどを順次統合します。',lat:35.2250,lng:138.6120},
-  {id:'life',name:'富士宮市 生活サービス',category:'life',address:'富士宮市',phone:'',site:'',desc:'病院、歯科、動物病院、美容、修理など暮らしの施設をまとめる入口です。',lat:35.2240,lng:138.6180},
-  {id:'stay',name:'富士宮市内 宿泊情報',category:'stay',address:'富士宮市',phone:'',site:'',desc:'ホテル、旅館、民宿、キャンプ場、ペット可施設をまとめて探せるようにします。',lat:35.2300,lng:138.6050},
-  {id:'community',name:'富士宮クーポン・スタンプ',category:'community',address:'富士宮市',phone:'',site:'',desc:'地域クーポン、デジタルスタンプ、店舗情報、地域交流機能をここに統合します。',lat:35.2260,lng:138.6120}
-];
+const dataPack = window.FUJINOMIYA_DATA || {version:'0', updatedAt:'', note:'', places:[]};
+const places = dataPack.places || [];
 
 const modePriority = {
   resident:['life','shopping','government','safety','kids','mobility','events','food','work','community','sightseeing','stay'],
@@ -45,6 +28,7 @@ const titleEl = document.getElementById('resultsTitle');
 const countEl = document.getElementById('resultCount');
 const searchInput = document.getElementById('globalSearch');
 const statusEl = document.getElementById('statusMessage');
+const summaryEl = document.getElementById('dataSummary');
 const template = document.getElementById('cardTemplate');
 const favoritesButton = document.getElementById('favoritesButton');
 let activeCategory = null;
@@ -61,12 +45,29 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution:'&copy; OpenStreetMap contributors'
 }).addTo(map);
 
+function hasCoords(place){
+  return Number.isFinite(place.lat) && Number.isFinite(place.lng);
+}
+
+function isConcreteAddress(place){
+  return place.address && place.address !== '富士宮市' && place.address !== '静岡県富士宮市';
+}
+
+function mapSearchUrl(place){
+  if(hasCoords(place)){
+    return `https://www.openstreetmap.org/?mlat=${place.lat}&mlon=${place.lng}#map=16/${place.lat}/${place.lng}`;
+  }
+  const q = encodeURIComponent(`${place.name} ${place.address || '富士宮市'}`);
+  return `https://www.openstreetmap.org/search?query=${q}`;
+}
+
 categories.forEach(cat=>{
   const btn=document.createElement('button');
   btn.className='category-card';
   btn.type='button';
   btn.dataset.id=cat.id;
-  btn.innerHTML=`<span class="icon">${cat.icon}</span><span class="name">${cat.name}</span>`;
+  const count=places.filter(p=>p.category===cat.id).length;
+  btn.innerHTML=`<span class="icon">${cat.icon}</span><span class="name">${cat.name}</span><span class="cat-count">${count}件</span>`;
   btn.addEventListener('click',()=>{
     activeCategory = activeCategory===cat.id ? null : cat.id;
     showFavoritesOnly=false;
@@ -77,6 +78,18 @@ categories.forEach(cat=>{
   });
   grid.appendChild(btn);
 });
+
+function renderDataSummary(){
+  const pinCount=places.filter(hasCoords).length;
+  const realPlaces=places.filter(p=>p.kind==='place').length;
+  summaryEl.innerHTML=`
+    <span><strong>${places.length}</strong> 登録情報</span>
+    <span><strong>${realPlaces}</strong> 施設・場所</span>
+    <span><strong>${pinCount}</strong> 確認済み地図ピン</span>
+    <span><strong>${categories.length}</strong> カテゴリ</span>
+  `;
+  summaryEl.title=dataPack.note || '';
+}
 
 function syncCategoryState(){
   document.querySelectorAll('.category-card').forEach(b=>b.classList.toggle('active', b.dataset.id===activeCategory));
@@ -94,18 +107,28 @@ function haversine(a,b){
 }
 
 function routeUrl(place){
-  if(userLocation){
+  if(userLocation && hasCoords(place)){
     return `https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=${userLocation.lat}%2C${userLocation.lng}%3B${place.lat}%2C${place.lng}`;
   }
-  return `https://www.openstreetmap.org/?mlat=${place.lat}&mlon=${place.lng}#map=16/${place.lat}/${place.lng}`;
+  return mapSearchUrl(place);
 }
 
 function sortedByMode(items){
   if(userLocation){
-    return [...items].sort((a,b)=>haversine(userLocation,a)-haversine(userLocation,b));
+    return [...items].sort((a,b)=>{
+      const da=hasCoords(a)?haversine(userLocation,a):Infinity;
+      const db=hasCoords(b)?haversine(userLocation,b):Infinity;
+      if(da!==db) return da-db;
+      return modePriority[mode].indexOf(a.category)-modePriority[mode].indexOf(b.category);
+    });
   }
   const order=modePriority[mode];
-  return [...items].sort((a,b)=>order.indexOf(a.category)-order.indexOf(b.category));
+  return [...items].sort((a,b)=>{
+    const categoryDiff=order.indexOf(a.category)-order.indexOf(b.category);
+    if(categoryDiff!==0) return categoryDiff;
+    if(a.kind!==b.kind) return a.kind==='place'?-1:1;
+    return a.name.localeCompare(b.name,'ja');
+  });
 }
 
 function render(items){
@@ -115,20 +138,24 @@ function render(items){
   countEl.textContent=`${items.length}件`;
 
   if(!items.length){
-    cardsEl.innerHTML='<div class="empty">該当する施設がありません。検索語・カテゴリー・お気に入り条件を変えてみてください。</div>';
+    cardsEl.innerHTML='<div class="empty">該当する情報がありません。検索語・カテゴリー・お気に入り条件を変えてみてください。</div>';
     return;
   }
 
   const bounds=[];
   items.forEach(place=>{
     const node=template.content.cloneNode(true);
+    const article=node.querySelector('.place-card');
+    article.classList.toggle('service-card',place.kind==='service');
     node.querySelector('.category-pill').textContent=categoryMap[place.category]?.name || '施設';
     node.querySelector('h3').textContent=place.name;
     node.querySelector('.description').textContent=place.desc;
-    node.querySelector('.meta').innerHTML=`<div>📍 ${place.address}</div>${place.phone?`<div>☎️ ${place.phone}</div>`:''}`;
+    node.querySelector('.meta').innerHTML=`<div>📍 ${place.address || '富士宮市'}</div>${place.phone?`<div>☎️ ${place.phone}</div>`:''}`;
 
     const distance=node.querySelector('.distance');
-    if(userLocation) distance.textContent=`約 ${haversine(userLocation,place).toFixed(1)} km`;
+    if(userLocation && hasCoords(place)) distance.textContent=`約 ${haversine(userLocation,place).toFixed(1)} km`;
+    else if(place.kind==='service') distance.textContent='案内';
+    else if(!hasCoords(place)) distance.textContent='住所検索';
 
     const favorite=node.querySelector('.favorite-btn');
     const updateFavorite=()=>{
@@ -145,6 +172,17 @@ function render(items){
       if(showFavoritesOnly) applyFilters();
     });
 
+    const tags=node.querySelector('.tags');
+    (place.tags || []).slice(0,5).forEach(tag=>{
+      const span=document.createElement('span');
+      span.textContent=tag;
+      tags.appendChild(span);
+    });
+
+    const source=node.querySelector('.source-label');
+    source.textContent=place.source?`情報元: ${place.source}`:'';
+    if(!place.source) node.querySelector('.source-row').hidden=true;
+
     const contact=node.querySelector('.contact-actions');
     if(place.phone){
       const tel=document.createElement('a');
@@ -157,28 +195,46 @@ function render(items){
       site.href=place.site;
       site.target='_blank';
       site.rel='noopener';
-      site.textContent='↗ 公式サイト';
+      site.textContent='↗ Webを見る';
       contact.appendChild(site);
     }
 
     const route=node.querySelector('.route-btn');
-    route.href=routeUrl(place);
-    route.textContent=userLocation?'現在地から行く':'場所を開く';
+    const mapBtn=node.querySelector('.map-btn');
 
-    node.querySelector('.map-btn').addEventListener('click',()=>{
-      map.setView([place.lat,place.lng],16);
-      const marker=markers.find(m=>m.options.title===place.name);
-      if(marker) marker.openPopup();
-      document.getElementById('mapSection').scrollIntoView({behavior:'smooth',block:'start'});
-    });
+    if(place.kind==='service' && !isConcreteAddress(place)){
+      mapBtn.hidden=true;
+      route.hidden=true;
+      if(!place.site && !place.phone){
+        node.querySelector('.card-actions').hidden=true;
+      }
+    }else{
+      route.href=routeUrl(place);
+      route.textContent=userLocation && hasCoords(place)?'現在地から行く':(hasCoords(place)?'場所を開く':'住所で探す');
+      mapBtn.textContent=hasCoords(place)?'地図で見る':'地図で検索';
+      mapBtn.addEventListener('click',()=>{
+        if(hasCoords(place)){
+          map.setView([place.lat,place.lng],16);
+          const marker=markers.find(m=>m.options.title===place.name);
+          if(marker) marker.openPopup();
+          document.getElementById('mapSection').scrollIntoView({behavior:'smooth',block:'start'});
+        }else{
+          window.open(mapSearchUrl(place),'_blank','noopener');
+        }
+      });
+    }
 
     cardsEl.appendChild(node);
-    const marker=L.marker([place.lat,place.lng],{title:place.name}).addTo(map).bindPopup(`<strong>${place.name}</strong><br>${place.address}`);
-    markers.push(marker);
-    bounds.push([place.lat,place.lng]);
+
+    if(hasCoords(place)){
+      const marker=L.marker([place.lat,place.lng],{title:place.name}).addTo(map).bindPopup(`<strong>${place.name}</strong><br>${place.address || ''}`);
+      markers.push(marker);
+      bounds.push([place.lat,place.lng]);
+    }
   });
 
-  if(items.length>1 && !userLocation) map.fitBounds(bounds,{padding:[24,24],maxZoom:13});
+  if(bounds.length>1 && !userLocation) map.fitBounds(bounds,{padding:[24,24],maxZoom:13});
+  else if(bounds.length===1 && !userLocation) map.setView(bounds[0],14);
 }
 
 function applyFilters(){
@@ -187,7 +243,7 @@ function applyFilters(){
   let items=places.filter(p=>{
     const categoryOK=!activeCategory || p.category===activeCategory;
     const favoriteOK=!showFavoritesOnly || favorites.has(p.id);
-    const hay=`${p.name} ${p.address} ${p.phone||''} ${p.desc} ${categoryMap[p.category]?.name||''}`.toLowerCase();
+    const hay=`${p.name} ${p.address||''} ${p.phone||''} ${p.desc||''} ${(p.tags||[]).join(' ')} ${p.source||''} ${categoryMap[p.category]?.name||''}`.toLowerCase();
     return categoryOK && favoriteOK && (!q || hay.includes(q));
   });
   items=sortedByMode(items);
@@ -209,7 +265,7 @@ function locate(){
     userMarker=L.circleMarker([userLocation.lat,userLocation.lng],{radius:9,weight:3,fillOpacity:.82}).addTo(map).bindPopup('現在地');
     map.setView([userLocation.lat,userLocation.lng],13);
     userMarker.openPopup();
-    statusEl.textContent='現在地を取得しました。距離の近い順に表示します。';
+    statusEl.textContent='現在地を取得しました。座標確認済みの施設は距離の近い順に表示します。';
     applyFilters();
   },()=>{
     statusEl.textContent='位置情報を取得できませんでした。Safariの位置情報許可を確認してください。';
@@ -263,5 +319,6 @@ document.querySelectorAll('.bottom-nav [data-target]').forEach(btn=>btn.addEvent
   if(btn.dataset.target==='mapSection') setTimeout(()=>map.invalidateSize(),400);
 }));
 
+renderDataSummary();
 updateModeUI();
 applyFilters();
