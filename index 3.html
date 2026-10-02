@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a5b46" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="富士宮まるごと" />
+  <title>富士宮まるごと | FUJINOMIYA ONE</title>
+  <link rel="preconnect" href="https://unpkg.com" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <link rel="stylesheet" href="styles.css?v=20261003-0744" />
+</head>
+<body>
+  <div class="app-shell" id="home">
+    <header class="topbar">
+      <button class="brand" id="homeBrand" type="button" aria-label="ホームへ戻る">
+        <span class="eyebrow">FUJINOMIYA ONE</span>
+        <strong>富士宮まるごと</strong>
+      </button>
+      <button class="mode-btn" id="modeButton" type="button" aria-label="市民・観光モード切り替え">
+        <span id="modeIcon">🏠</span><span id="modeLabel">市民</span>
+      </button>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="heroTitle">
+        <div class="hero-copy">
+          <p class="hero-kicker">観光も、暮らしも、これひとつ。</p>
+          <h1 id="heroTitle">富士宮市を<br class="mobile-break">まるごと探す</h1>
+          <p>グルメ・観光・買い物・医療・行政・防災・交通をひとつの入口から。</p>
+        </div>
+        <div class="hero-badge" id="heroModeBadge">市民モード</div>
+        <div class="mountain" aria-hidden="true"></div>
+      </section>
+
+      <section class="search-panel" id="searchSection" aria-label="検索">
+        <label class="search-box" for="globalSearch">
+          <span aria-hidden="true">🔎</span>
+          <input id="globalSearch" type="search" placeholder="富士宮焼きそば、病院、温泉、駐車場…" autocomplete="off" />
+        </label>
+        <button id="searchButton" class="primary-btn" type="button">検索</button>
+        <div class="quick-actions">
+          <button id="nearbyButton" class="secondary-btn" type="button">📍 現在地から探す</button>
+          <button id="favoritesButton" class="secondary-btn" type="button">♡ お気に入り</button>
+          <button id="showAllButton" class="secondary-btn" type="button">すべて表示</button>
+        </div>
+        <div id="statusMessage" class="status" role="status" aria-live="polite"></div>
+        <div class="data-summary" id="dataSummary" aria-label="登録データ概要"></div>
+      </section>
+
+      <section class="mode-strip" aria-label="おすすめ切り替え">
+        <div>
+          <strong id="modeTitle">暮らしに便利な情報を優先</strong>
+          <span id="modeDescription">医療・買い物・行政・防災などを上位に表示します。</span>
+        </div>
+        <button id="modeStripButton" type="button">観光モードへ</button>
+      </section>
+
+      <section class="category-section" aria-labelledby="categoryTitle">
+        <div class="section-title-row">
+          <div>
+            <span class="eyebrow">CATEGORIES</span>
+            <h2 id="categoryTitle">何を探しますか？</h2>
+          </div>
+          <span class="hint">タップで絞り込み</span>
+        </div>
+        <nav class="category-grid" id="categoryGrid" aria-label="カテゴリー"></nav>
+      </section>
+
+      <section class="content-grid" id="resultsSection">
+        <section class="results-panel">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">SEARCH RESULTS</span>
+              <h2 id="resultsTitle">市民向けおすすめ</h2>
+            </div>
+            <span class="count-badge" id="resultCount">0件</span>
+          </div>
+          <div id="cards" class="cards"></div>
+        </section>
+
+        <aside class="map-panel" id="mapSection">
+          <div class="section-head compact">
+            <div>
+              <span class="eyebrow">MAP</span>
+              <h2>富士宮マップ</h2>
+            </div>
+            <button id="mapLocateButton" class="mini-btn" type="button">📍 現在地</button>
+          </div>
+          <div id="map" aria-label="富士宮市内地図"></div>
+          <p class="map-note">地図：OpenStreetMap。現在地の利用には端末の位置情報許可が必要です。</p>
+        </aside>
+      </section>
+    </main>
+
+    <footer>
+      <strong>富士宮まるごと</strong>
+      <span>富士宮の観光と暮らしをひとつに。 <a class="admin-link" href="admin.html">管理者</a></span>
+    </footer>
+  </div>
+
+  <nav class="bottom-nav" aria-label="メインメニュー">
+    <button type="button" data-target="home"><span>⌂</span><small>ホーム</small></button>
+    <button type="button" data-target="searchSection"><span>⌕</span><small>検索</small></button>
+    <button type="button" data-target="mapSection"><span>⌖</span><small>地図</small></button>
+    <button type="button" id="bottomFavorite"><span>♡</span><small>お気に入り</small></button>
+    <button type="button" id="bottomMode"><span>⇄</span><small>モード</small></button>
+  </nav>
+
+  <template id="cardTemplate">
+    <article class="place-card">
+      <div class="card-topline">
+        <span class="category-pill"></span>
+        <div class="card-top-actions">
+          <span class="distance"></span>
+          <button class="favorite-btn" type="button" aria-label="お気に入りに追加">♡</button>
+        </div>
+      </div>
+      <h3></h3>
+      <p class="description"></p>
+      <div class="meta"></div>
+      <div class="tags"></div>
+      <div class="source-row"><span class="source-label"></span></div>
+      <div class="contact-actions"></div>
+      <div class="card-actions">
+        <button class="map-btn" type="button">地図で見る</button>
+        <a class="route-btn" target="_blank" rel="noopener">行き方</a>
+      </div>
+    </article>
+  </template>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js?v=20261003-0744"></script>
+  <script src="supabase-client.js?v=20261003-0744"></script>
+  <script src="data.js?v=20261003-0744"></script>
+  <script src="app.js?v=20261003-0744"></script>
+</body>
+</html>
