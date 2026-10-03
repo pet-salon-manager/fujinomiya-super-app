@@ -13,7 +13,7 @@
   <title>富士宮まるごと | FUJINOMIYA ONE</title>
   <link rel="preconnect" href="https://unpkg.com" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=20261003-v5" />
+  <link rel="stylesheet" href="styles.css?v=20261003-v7" />
 </head>
 <body>
   <div class="app-shell" id="home">
@@ -78,6 +78,8 @@
           <button type="button" data-filter="wheelchair">♿ バリアフリー</button>
           <button type="button" data-filter="emergency">24h 緊急対応</button>
           <button type="button" data-filter="placeOnly">施設・場所のみ</button>
+          <button type="button" data-filter="verified">✓ 確認済みのみ</button>
+          <button type="button" data-filter="address">📍 住所あり</button>
         </div>
         <p id="filterStatus" class="filter-status">条件指定なし</p>
       </section>
@@ -102,7 +104,19 @@
             </div>
             <span class="count-badge" id="resultCount">0件</span>
           </div>
+          <div class="results-toolbar">
+            <span id="resultsMeta">0件</span>
+            <label class="sort-control">並び順
+              <select id="sortSelect" aria-label="検索結果の並び順">
+                <option value="recommended">おすすめ順</option>
+                <option value="name">名前順</option>
+                <option value="verified">確認済み優先</option>
+                <option value="nearby">現在地から近い順</option>
+              </select>
+            </label>
+          </div>
           <div id="cards" class="cards"></div>
+          <button id="loadMoreButton" class="load-more" type="button" hidden>もっと見る</button>
         </section>
 
         <aside class="map-panel" id="mapSection">
@@ -159,8 +173,8 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config.js?v=20261003-v5"></script>
-  <script src="data.js?v=20261003-v5"></script>
-  <script src="app-live.js?v=20261003-v5"></script>
+  <script src="config.js?v=20261003-v7"></script>
+  <script src="data.js?v=20261003-v7"></script>
+  <script src="app-live.js?v=20261003-v7"></script>
 </body>
 </html>

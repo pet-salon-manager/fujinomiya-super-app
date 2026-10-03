@@ -34,6 +34,9 @@ const template = document.getElementById('cardTemplate');
 const favoritesButton = document.getElementById('favoritesButton');
 const filterStatusEl = document.getElementById('filterStatus');
 const filterChipsEl = document.getElementById('filterChips');
+const resultsMetaEl = document.getElementById('resultsMeta');
+const sortSelect = document.getElementById('sortSelect');
+const loadMoreButton = document.getElementById('loadMoreButton');
 
 let activeCategory = null;
 let userLocation = null;
@@ -43,6 +46,12 @@ let showFavoritesOnly = false;
 let mode = localStorage.getItem('fujinomiya-mode') || 'resident';
 let favorites = new Set(JSON.parse(localStorage.getItem('fujinomiya-favorites') || '[]'));
 const activeFilters = new Set();
+const PAGE_SIZE = 30;
+const MAP_MARKER_LIMIT = 120;
+let visibleLimit = PAGE_SIZE;
+let currentResults = [];
+let sortMode = localStorage.getItem('fujinomiya-sort') || 'recommended';
+let searchTimer = null;
 
 const map = L.map('map', {zoomControl:true}).setView([35.229,138.61], 12);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -130,6 +139,25 @@ async function loadRemotePlaces(){
   }
 }
 
+
+function normalizeText(value){
+  return String(value || '')
+    .normalize('NFKC')
+    .toLowerCase()
+    .replace(/[ァ-ヶ]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0x60))
+    .replace(/\s+/g,' ')
+    .trim();
+}
+
+function buildSearchText(place){
+  return normalizeText([
+    place.name, place.address, place.phone, place.desc,
+    ...(place.tags || []), place.source, place.area,
+    place.openingHours, place.regularHoliday, place.priceNote,
+    categoryMap[place.category]?.name || ''
+  ].join(' '));
+}
+
 function mapSearchUrl(place){
   if(hasCoords(place)){
     return `https://www.openstreetmap.org/?mlat=${place.lat}&mlon=${place.lng}#map=16/${place.lat}/${place.lng}`;
@@ -164,12 +192,16 @@ function renderDataSummary(){
   const realPlaces=places.filter(p=>p.kind==='place').length;
   const phoneCount=places.filter(p=>p.phone).length;
   const webCount=places.filter(p=>p.site).length;
+  const verifiedCount=places.filter(p=>p.verificationStatus==='verified').length;
+  const reviewCount=places.filter(p=>p.verificationStatus==='needs_review').length;
   summaryEl.innerHTML=`
     <span><strong>${places.length}</strong> 登録情報</span>
     <span><strong>${realPlaces}</strong> 施設・場所</span>
     <span><strong>${pinCount}</strong> 地図ピン</span>
     <span><strong>${phoneCount}</strong> 電話あり</span>
     <span><strong>${webCount}</strong> Webあり</span>
+    <span><strong>${verifiedCount}</strong> 確認済み</span>
+    <span><strong>${reviewCount}</strong> 情報確認中</span>
     <span class="source-badge"><strong>DB</strong> ${dataSource}</span>
   `;
 }
@@ -214,6 +246,31 @@ function sortedByMode(items){
   });
 }
 
+
+function sortItems(items){
+  if(sortMode==='name'){
+    return [...items].sort((a,b)=>a.name.localeCompare(b.name,'ja'));
+  }
+  if(sortMode==='verified'){
+    return [...items].sort((a,b)=>{
+      const av=a.verificationStatus==='verified'?0:1;
+      const bv=b.verificationStatus==='verified'?0:1;
+      if(av!==bv) return av-bv;
+      return a.name.localeCompare(b.name,'ja');
+    });
+  }
+  if(sortMode==='nearby'){
+    if(!userLocation) return sortedByMode(items);
+    return [...items].sort((a,b)=>{
+      const da=hasCoords(a)?haversine(userLocation,a):Infinity;
+      const db=hasCoords(b)?haversine(userLocation,b):Infinity;
+      if(da!==db) return da-db;
+      return a.name.localeCompare(b.name,'ja');
+    });
+  }
+  return sortedByMode(items);
+}
+
 function addBadge(container,text,className=''){
   const span=document.createElement('span');
   span.textContent=text;
@@ -222,18 +279,28 @@ function addBadge(container,text,className=''){
 }
 
 function render(items){
+  currentResults=[...items];
+  visibleLimit=Math.min(PAGE_SIZE,currentResults.length);
+  renderCurrentResults();
+}
+
+function renderCurrentResults(){
   cardsEl.innerHTML='';
   markers.forEach(m=>map.removeLayer(m));
   markers=[];
-  countEl.textContent=`${items.length}件`;
 
-  if(!items.length){
+  const total=currentResults.length;
+  const visibleItems=currentResults.slice(0,visibleLimit);
+  countEl.textContent=`${total}件`;
+  resultsMetaEl.textContent=total?`全${total}件中 ${visibleItems.length}件を表示`:'0件';
+
+  if(!total){
     cardsEl.innerHTML='<div class="empty">該当する情報がありません。検索語・カテゴリー・絞り込み条件を変えてみてください。</div>';
+    loadMoreButton.hidden=true;
     return;
   }
 
-  const bounds=[];
-  items.forEach(place=>{
+  visibleItems.forEach(place=>{
     const node=template.content.cloneNode(true);
     const article=node.querySelector('.place-card');
     article.classList.toggle('service-card',place.kind==='service');
@@ -280,10 +347,15 @@ function render(items){
     (place.tags || []).slice(0,5).forEach(tag=>addBadge(tags,tag));
 
     const verification=node.querySelector('.verification-row');
-    if(place.verificationStatus==='verified' || place.lastVerified){
+    if(place.verificationStatus==='verified' || place.lastVerified || place.verificationStatus==='needs_review'){
       verification.hidden=false;
-      const label=place.verificationStatus==='verified'?'確認済み':'確認日あり';
-      verification.textContent=place.lastVerified?`${label}：${place.lastVerified}`:label;
+      if(place.verificationStatus==='verified'){
+        verification.textContent=place.lastVerified?`✓ 確認済み：${place.lastVerified}`:'✓ 確認済み';
+      }else if(place.verificationStatus==='needs_review'){
+        verification.textContent=place.lastVerified?`情報確認中（確認日：${place.lastVerified}）`:'情報確認中';
+      }else{
+        verification.textContent=`確認日：${place.lastVerified}`;
+      }
     }
 
     const source=node.querySelector('.source-label');
@@ -330,7 +402,7 @@ function render(items){
       mapBtn.addEventListener('click',()=>{
         if(hasCoords(place)){
           map.setView([place.lat,place.lng],16);
-          const marker=markers.find(m=>m.options.title===place.name);
+          const marker=markers.find(m=>m.options.placeId===place.id);
           if(marker) marker.openPopup();
           document.getElementById('mapSection').scrollIntoView({behavior:'smooth',block:'start'});
         }else{
@@ -340,16 +412,24 @@ function render(items){
     }
 
     cardsEl.appendChild(node);
+  });
 
-    if(hasCoords(place)){
-      const marker=L.marker([place.lat,place.lng],{title:place.name}).addTo(map).bindPopup(`<strong>${place.name}</strong><br>${place.address || ''}`);
-      markers.push(marker);
-      bounds.push([place.lat,place.lng]);
-    }
+  const mappable=currentResults.filter(hasCoords).slice(0,MAP_MARKER_LIMIT);
+  const bounds=[];
+  mappable.forEach(place=>{
+    const marker=L.marker([place.lat,place.lng],{title:place.name,placeId:place.id}).addTo(map).bindPopup(`<strong>${place.name}</strong><br>${place.address || ''}`);
+    markers.push(marker);
+    bounds.push([place.lat,place.lng]);
   });
 
   if(bounds.length>1 && !userLocation) map.fitBounds(bounds,{padding:[24,24],maxZoom:13});
   else if(bounds.length===1 && !userLocation) map.setView(bounds[0],14);
+
+  loadMoreButton.hidden=visibleLimit>=total;
+  if(!loadMoreButton.hidden){
+    const remain=total-visibleLimit;
+    loadMoreButton.textContent=`もっと見る（残り${remain}件）`;
+  }
 }
 
 function passesQuickFilters(place){
@@ -362,6 +442,8 @@ function passesQuickFilters(place){
     if(filter==='wheelchair' && place.wheelchairAccessible!==true) return false;
     if(filter==='emergency' && place.emergency24h!==true) return false;
     if(filter==='placeOnly' && place.kind!=='place') return false;
+    if(filter==='verified' && place.verificationStatus!=='verified') return false;
+    if(filter==='address' && !isConcreteAddress(place)) return false;
   }
   return true;
 }
@@ -377,14 +459,15 @@ function updateFilterUI(){
 
 function applyFilters(){
   const raw=searchInput.value.trim();
-  const q=raw.toLowerCase();
+  const terms=normalizeText(raw).split(' ').filter(Boolean);
   let items=places.filter(p=>{
     const categoryOK=!activeCategory || p.category===activeCategory;
     const favoriteOK=!showFavoritesOnly || favorites.has(p.id);
-    const hay=`${p.name} ${p.address||''} ${p.phone||''} ${p.desc||''} ${(p.tags||[]).join(' ')} ${p.source||''} ${p.area||''} ${p.openingHours||''} ${p.regularHoliday||''} ${p.priceNote||''} ${categoryMap[p.category]?.name||''}`.toLowerCase();
-    return categoryOK && favoriteOK && passesQuickFilters(p) && (!q || hay.includes(q));
+    const hay=buildSearchText(p);
+    const queryOK=!terms.length || terms.every(term=>hay.includes(term));
+    return categoryOK && favoriteOK && passesQuickFilters(p) && queryOK;
   });
-  items=sortedByMode(items);
+  items=sortItems(items);
 
   if(showFavoritesOnly) titleEl.textContent='お気に入り';
   else if(activeCategory) titleEl.textContent=categoryMap[activeCategory].name;
@@ -403,7 +486,7 @@ function locate(){
     userMarker=L.circleMarker([userLocation.lat,userLocation.lng],{radius:9,weight:3,fillOpacity:.82}).addTo(map).bindPopup('現在地');
     map.setView([userLocation.lat,userLocation.lng],13);
     userMarker.openPopup();
-    statusEl.textContent='現在地を取得しました。座標確認済みの施設は距離の近い順に表示します。';
+    statusEl.textContent='現在地を取得しました。並び順で「現在地から近い順」を選べます。';
     applyFilters();
   },()=>{
     statusEl.textContent='位置情報を取得できませんでした。Safariの位置情報許可を確認してください。';
@@ -450,6 +533,32 @@ document.getElementById('clearFiltersButton').addEventListener('click',()=>{
   activeFilters.clear();
   updateFilterUI();
   applyFilters();
+});
+
+sortSelect.value=sortMode;
+sortSelect.addEventListener('change',()=>{
+  sortMode=sortSelect.value;
+  localStorage.setItem('fujinomiya-sort',sortMode);
+  if(sortMode==='nearby' && !userLocation){
+    statusEl.textContent='「現在地から近い順」は位置情報を取得すると有効になります。';
+  }
+  applyFilters();
+});
+
+loadMoreButton.addEventListener('click',()=>{
+  visibleLimit=Math.min(visibleLimit+PAGE_SIZE,currentResults.length);
+  renderCurrentResults();
+});
+
+searchInput.addEventListener('input',()=>{
+  clearTimeout(searchTimer);
+  searchTimer=setTimeout(()=>{
+    if(searchInput.value.trim().length===0 || searchInput.value.trim().length>=2){
+      showFavoritesOnly=false;
+      favoritesButton.classList.remove('active');
+      applyFilters();
+    }
+  },260);
 });
 
 document.getElementById('searchButton').addEventListener('click',()=>{
