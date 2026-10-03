@@ -13,17 +13,26 @@
   <title>富士宮まるごと | FUJINOMIYA ONE</title>
   <link rel="preconnect" href="https://unpkg.com" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=20261003-v16" />
+  <link rel="stylesheet" href="styles.css?v=20261003-v17" />
 </head>
 <body>
   <div class="app-shell" id="home">
     <header class="topbar">
       <button class="brand" id="homeBrand" type="button" aria-label="ホームへ戻る">
-        <span class="eyebrow">FUJINOMIYA ONE</span>
-        <strong>富士宮まるごと</strong>
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 96 72" role="img" aria-hidden="true">
+            <path d="M8 64L40 14l10 15 9-12 29 47H8Z" fill="#1ba9ec"/>
+            <path d="M30 31l10-17 10 15 9-12 10 17-11-4-8 9-8-9-12 1Z" fill="#fff" opacity=".96"/>
+            <path d="M15 64c12-8 24-10 34-9 15 0 27 4 38 9H15Z" fill="#57c5f5"/>
+          </svg>
+        </span>
+        <span class="brand-copy">
+          <span class="eyebrow">FUJINOMIYA ONE</span>
+          <strong>富士宮まるごと</strong>
+        </span>
       </button>
       <button class="mode-btn" id="modeButton" type="button" aria-label="市民・観光モード切り替え">
-        <span id="modeIcon">🏠</span><span id="modeLabel">市民</span>
+        <span id="modeIcon">🏠</span><span id="modeLabel">市民</span><span class="mode-arrow" aria-hidden="true">›</span>
       </button>
     </header>
 
@@ -34,18 +43,21 @@
           <h1 id="heroTitle">富士宮市を<br class="mobile-break">まるごと探す</h1>
           <p>グルメ・観光・買い物・医療・行政・防災・交通をひとつの入口から。</p>
         </div>
-        <div class="hero-badge" id="heroModeBadge">市民モード</div>
+        <a class="hero-cta" href="#categoryTitle"><span class="hero-play" aria-hidden="true">▶</span><span>富士宮の魅力を見る</span><span aria-hidden="true">›</span></a>
+        <div class="hero-dots" aria-hidden="true"><span class="active"></span><span></span><span></span><span></span></div>
+        <div class="hero-badge" id="heroModeBadge" hidden>市民モード</div>
         <div class="mountain" aria-hidden="true"></div>
       </section>
 
 
 
       <section class="mode-strip" aria-label="おすすめ切り替え">
-        <div>
+        <span class="mode-emblem" aria-hidden="true">♛</span>
+        <div class="mode-strip-copy">
           <strong id="modeTitle">暮らしに便利な情報を優先</strong>
           <span id="modeDescription">医療・買い物・行政・防災などを上位に表示します。</span>
         </div>
-        <button id="modeStripButton" type="button">観光モードへ</button>
+        <button id="modeStripButton" type="button">観光モードへ <span aria-hidden="true">›</span></button>
       </section>
 
       <section class="category-section" aria-labelledby="categoryTitle">
@@ -59,45 +71,51 @@
         <nav class="category-grid" id="categoryGrid" aria-label="カテゴリー"></nav>
       </section>
 
-      <section class="search-panel" id="searchSection" aria-label="検索">
-        <label class="search-box" for="globalSearch">
-          <span aria-hidden="true">🔎</span>
-          <input id="globalSearch" type="search" placeholder="富士宮焼きそば、病院、温泉、駐車場…" autocomplete="off" />
-        </label>
-        <button id="searchButton" class="primary-btn" type="button">検索</button>
-        <div class="quick-actions">
-          <button id="nearbyButton" class="secondary-btn" type="button">📍 現在地から探す</button>
-          <button id="favoritesButton" class="secondary-btn" type="button">♡ お気に入り</button>
-          <button id="showAllButton" class="secondary-btn" type="button">すべて表示</button>
-        </div>
-        <div id="statusMessage" class="status" role="status" aria-live="polite"></div>
-        <div class="data-summary" id="dataSummary" aria-label="登録データ概要" hidden></div>
-      </section>
+      <section class="search-zone" aria-label="検索と絞り込み">
+        <section class="search-panel" id="searchSection" aria-label="検索">
+          <div class="search-box">
+            <button id="searchButton" class="search-icon-button" type="button" aria-label="検索する">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m15.5 15.5 5 5"></path></svg>
+            </button>
+            <label class="visually-hidden" for="globalSearch">キーワードで検索</label>
+            <input id="globalSearch" type="search" placeholder="キーワードで検索（例：富士宮やきそば、病院 など）" autocomplete="off" />
+          </div>
+          <button id="filterToggleButton" class="filter-launch-button" type="button" aria-expanded="false" aria-controls="filterContent" aria-label="条件で絞り込む">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"></path><circle cx="9" cy="6" r="2"></circle><circle cx="15" cy="12" r="2"></circle><circle cx="8" cy="18" r="2"></circle></svg>
+            <span class="filter-launch-text">条件で絞り込む</span>
+            <span id="filterToggleCount" class="filter-toggle-count" hidden>0</span>
+            <span id="filterChevron" class="filter-chevron" aria-hidden="true">⌄</span>
+          </button>
+          <div class="quick-actions">
+            <button id="nearbyButton" class="secondary-btn" type="button">📍 現在地から探す</button>
+            <button id="favoritesButton" class="secondary-btn" type="button">♡ お気に入り</button>
+            <button id="showAllButton" class="secondary-btn" type="button">すべて表示</button>
+          </div>
+          <div id="statusMessage" class="status" role="status" aria-live="polite"></div>
+          <div class="data-summary" id="dataSummary" aria-label="登録データ概要" hidden></div>
+        </section>
 
-      <section class="filter-panel filter-panel-collapsed" aria-labelledby="filterToggleButton">
-        <button id="filterToggleButton" class="filter-toggle-button" type="button" aria-expanded="false" aria-controls="filterContent">
-          <span class="filter-toggle-main"><span class="filter-toggle-icon" aria-hidden="true">☰</span><strong>条件で絞り込む</strong></span>
-          <span class="filter-toggle-side"><span id="filterToggleCount" class="filter-toggle-count" hidden>0</span><span id="filterChevron" class="filter-chevron" aria-hidden="true">⌄</span></span>
-        </button>
-        <div id="filterContent" class="filter-content" hidden>
-          <div class="filter-head">
-            <div><span class="eyebrow">QUICK FILTERS</span><h2 id="filterTitle">条件を選択</h2></div>
-            <button id="clearFiltersButton" class="filter-clear" type="button">条件を解除</button>
+        <section class="filter-panel filter-panel-collapsed" aria-labelledby="filterTitle">
+          <div id="filterContent" class="filter-content" hidden>
+            <div class="filter-head">
+              <div><span class="eyebrow">QUICK FILTERS</span><h2 id="filterTitle">条件で絞り込む</h2></div>
+              <button id="clearFiltersButton" class="filter-clear" type="button">条件を解除</button>
+            </div>
+            <div id="filterChips" class="filter-chips">
+              <button type="button" data-filter="phone">☎ 電話あり</button>
+              <button type="button" data-filter="web">↗ 公式サイト</button>
+              <button type="button" data-filter="map">⌖ 地図ピン</button>
+              <button type="button" data-filter="parking">🅿 駐車場あり</button>
+              <button type="button" data-filter="pets">🐾 ペット可</button>
+              <button type="button" data-filter="wheelchair">♿ バリアフリー</button>
+              <button type="button" data-filter="emergency">24h 緊急対応</button>
+              <button type="button" data-filter="placeOnly">施設・場所のみ</button>
+              <button type="button" data-filter="verified">✓ 確認済みのみ</button>
+              <button type="button" data-filter="address">📍 住所あり</button>
+            </div>
+            <p id="filterStatus" class="filter-status">条件指定なし</p>
           </div>
-          <div id="filterChips" class="filter-chips">
-            <button type="button" data-filter="phone">☎ 電話あり</button>
-            <button type="button" data-filter="web">↗ 公式サイト</button>
-            <button type="button" data-filter="map">⌖ 地図ピン</button>
-            <button type="button" data-filter="parking">🅿 駐車場あり</button>
-            <button type="button" data-filter="pets">🐾 ペット可</button>
-            <button type="button" data-filter="wheelchair">♿ バリアフリー</button>
-            <button type="button" data-filter="emergency">24h 緊急対応</button>
-            <button type="button" data-filter="placeOnly">施設・場所のみ</button>
-            <button type="button" data-filter="verified">✓ 確認済みのみ</button>
-            <button type="button" data-filter="address">📍 住所あり</button>
-          </div>
-          <p id="filterStatus" class="filter-status">条件指定なし</p>
-        </div>
+        </section>
       </section>
 
       <section class="content-grid" id="resultsSection">
@@ -196,6 +214,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js?v=20261003-v9"></script>
   <script src="data.js?v=20261003-v9"></script>
-  <script src="app-live.js?v=20261003-v16"></script>
+  <script src="app-live.js?v=20261003-v17"></script>
 </body>
 </html>

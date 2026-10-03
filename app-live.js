@@ -189,7 +189,7 @@ function renderCategories(){
     btn.type='button';
     btn.dataset.id=cat.id;
     const count=places.filter(p=>p.category===cat.id).length;
-    btn.innerHTML=`<span class="icon">${cat.icon}</span><span class="name">${cat.name}</span><span class="cat-count">${count}件</span>`;
+    btn.innerHTML=`<span class="icon">${cat.icon}</span><span class="name">${cat.name}</span><span class="cat-chevron" aria-hidden="true">›</span><span class="cat-count">${count}件</span>`;
     btn.addEventListener('click',()=>{
       activeCategory = activeCategory===cat.id ? null : cat.id;
       if(activeCategory!=='mobility') mobilitySubtype='all';
