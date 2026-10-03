@@ -32,6 +32,9 @@ const statusEl = document.getElementById('statusMessage');
 const summaryEl = document.getElementById('dataSummary');
 const template = document.getElementById('cardTemplate');
 const favoritesButton = document.getElementById('favoritesButton');
+const filterStatusEl = document.getElementById('filterStatus');
+const filterChipsEl = document.getElementById('filterChips');
+
 let activeCategory = null;
 let userLocation = null;
 let markers = [];
@@ -39,6 +42,7 @@ let userMarker = null;
 let showFavoritesOnly = false;
 let mode = localStorage.getItem('fujinomiya-mode') || 'resident';
 let favorites = new Set(JSON.parse(localStorage.getItem('fujinomiya-favorites') || '[]'));
+const activeFilters = new Set();
 
 const map = L.map('map', {zoomControl:true}).setView([35.229,138.61], 12);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -54,6 +58,10 @@ function isConcreteAddress(place){
   return place.address && place.address !== '富士宮市' && place.address !== '静岡県富士宮市';
 }
 
+function toTriState(value){
+  return value === true ? true : value === false ? false : null;
+}
+
 function mapDbRow(row){
   return {
     id:String(row.id),
@@ -67,7 +75,20 @@ function mapDbRow(row){
     tags:Array.isArray(row.tags) ? row.tags : [],
     lat:row.lat == null ? null : Number(row.lat),
     lng:row.lng == null ? null : Number(row.lng),
-    source:row.source || ''
+    source:row.source || '',
+    area:row.area || '',
+    openingHours:row.opening_hours || '',
+    regularHoliday:row.regular_holiday || '',
+    parking:toTriState(row.parking),
+    parkingNote:row.parking_note || '',
+    petFriendly:toTriState(row.pet_friendly),
+    wheelchairAccessible:toTriState(row.wheelchair_accessible),
+    emergency24h:toTriState(row.emergency_24h),
+    bookingUrl:row.booking_url || '',
+    priceNote:row.price_note || '',
+    imageUrl:row.image_url || '',
+    lastVerified:row.last_verified || '',
+    verificationStatus:row.verification_status || 'unverified'
   };
 }
 
@@ -81,8 +102,6 @@ async function loadRemotePlaces(){
     return;
   }
 
-  // 一般公開画面は管理者ログイン状態に依存させず、常に公開用クライアントで読み込む。
-  // これにより admin.html の認証セッションやSafariの保存状態に左右されない。
   const publicClient = window.supabase.createClient(url, key, {
     auth: {
       persistSession: false,
@@ -94,7 +113,7 @@ async function loadRemotePlaces(){
   try{
     const {data,error}=await publicClient
       .from('places')
-      .select('id,name,category,kind,address,phone,site,description,tags,lat,lng,source,sort_order,is_published')
+      .select('*')
       .eq('is_published',true)
       .order('sort_order',{ascending:true})
       .order('name',{ascending:true});
@@ -143,14 +162,16 @@ function renderCategories(){
 function renderDataSummary(){
   const pinCount=places.filter(hasCoords).length;
   const realPlaces=places.filter(p=>p.kind==='place').length;
+  const phoneCount=places.filter(p=>p.phone).length;
+  const webCount=places.filter(p=>p.site).length;
   summaryEl.innerHTML=`
     <span><strong>${places.length}</strong> 登録情報</span>
     <span><strong>${realPlaces}</strong> 施設・場所</span>
-    <span><strong>${pinCount}</strong> 確認済み地図ピン</span>
-    <span><strong>${categories.length}</strong> カテゴリ</span>
+    <span><strong>${pinCount}</strong> 地図ピン</span>
+    <span><strong>${phoneCount}</strong> 電話あり</span>
+    <span><strong>${webCount}</strong> Webあり</span>
     <span class="source-badge"><strong>DB</strong> ${dataSource}</span>
   `;
-  summaryEl.title=dataSource==='Supabase'?'Supabaseから公開中データを取得しています。':(dataPack.note || '');
 }
 
 function syncCategoryState(){
@@ -193,6 +214,13 @@ function sortedByMode(items){
   });
 }
 
+function addBadge(container,text,className=''){
+  const span=document.createElement('span');
+  span.textContent=text;
+  if(className) span.className=className;
+  container.appendChild(span);
+}
+
 function render(items){
   cardsEl.innerHTML='';
   markers.forEach(m=>map.removeLayer(m));
@@ -200,7 +228,7 @@ function render(items){
   countEl.textContent=`${items.length}件`;
 
   if(!items.length){
-    cardsEl.innerHTML='<div class="empty">該当する情報がありません。検索語・カテゴリー・お気に入り条件を変えてみてください。</div>';
+    cardsEl.innerHTML='<div class="empty">該当する情報がありません。検索語・カテゴリー・絞り込み条件を変えてみてください。</div>';
     return;
   }
 
@@ -212,7 +240,13 @@ function render(items){
     node.querySelector('.category-pill').textContent=categoryMap[place.category]?.name || '施設';
     node.querySelector('h3').textContent=place.name;
     node.querySelector('.description').textContent=place.desc;
-    node.querySelector('.meta').innerHTML=`<div>📍 ${place.address || '富士宮市'}</div>${place.phone?`<div>☎️ ${place.phone}</div>`:''}`;
+
+    const metaParts=[];
+    if(place.address) metaParts.push(`<div>📍 ${place.address}</div>`);
+    if(place.phone) metaParts.push(`<div>☎️ ${place.phone}</div>`);
+    if(place.openingHours) metaParts.push(`<div>🕒 ${place.openingHours}</div>`);
+    if(place.regularHoliday) metaParts.push(`<div>休 ${place.regularHoliday}</div>`);
+    node.querySelector('.meta').innerHTML=metaParts.join('');
 
     const distance=node.querySelector('.distance');
     if(userLocation && hasCoords(place)) distance.textContent=`約 ${haversine(userLocation,place).toFixed(1)} km`;
@@ -234,12 +268,23 @@ function render(items){
       if(showFavoritesOnly) applyFilters();
     });
 
+    const details=node.querySelector('.detail-badges');
+    if(place.parking===true) addBadge(details,'🅿 駐車場');
+    if(place.petFriendly===true) addBadge(details,'🐾 ペット可');
+    if(place.wheelchairAccessible===true) addBadge(details,'♿ バリアフリー');
+    if(place.emergency24h===true) addBadge(details,'24h');
+    if(place.priceNote) addBadge(details,place.priceNote);
+    if(!details.children.length) details.hidden=true;
+
     const tags=node.querySelector('.tags');
-    (place.tags || []).slice(0,5).forEach(tag=>{
-      const span=document.createElement('span');
-      span.textContent=tag;
-      tags.appendChild(span);
-    });
+    (place.tags || []).slice(0,5).forEach(tag=>addBadge(tags,tag));
+
+    const verification=node.querySelector('.verification-row');
+    if(place.verificationStatus==='verified' || place.lastVerified){
+      verification.hidden=false;
+      const label=place.verificationStatus==='verified'?'確認済み':'確認日あり';
+      verification.textContent=place.lastVerified?`${label}：${place.lastVerified}`:label;
+    }
 
     const source=node.querySelector('.source-label');
     source.textContent=place.source?`情報元: ${place.source}`:'';
@@ -260,6 +305,14 @@ function render(items){
       site.textContent='↗ Webを見る';
       contact.appendChild(site);
     }
+    if(place.bookingUrl){
+      const booking=document.createElement('a');
+      booking.href=place.bookingUrl;
+      booking.target='_blank';
+      booking.rel='noopener';
+      booking.textContent='予約・受付';
+      contact.appendChild(booking);
+    }
 
     const route=node.querySelector('.route-btn');
     const mapBtn=node.querySelector('.map-btn');
@@ -267,7 +320,7 @@ function render(items){
     if(place.kind==='service' && !isConcreteAddress(place)){
       mapBtn.hidden=true;
       route.hidden=true;
-      if(!place.site && !place.phone){
+      if(!place.site && !place.phone && !place.bookingUrl){
         node.querySelector('.card-actions').hidden=true;
       }
     }else{
@@ -299,14 +352,37 @@ function render(items){
   else if(bounds.length===1 && !userLocation) map.setView(bounds[0],14);
 }
 
+function passesQuickFilters(place){
+  for(const filter of activeFilters){
+    if(filter==='phone' && !place.phone) return false;
+    if(filter==='web' && !place.site) return false;
+    if(filter==='map' && !hasCoords(place)) return false;
+    if(filter==='parking' && place.parking!==true) return false;
+    if(filter==='pets' && place.petFriendly!==true) return false;
+    if(filter==='wheelchair' && place.wheelchairAccessible!==true) return false;
+    if(filter==='emergency' && place.emergency24h!==true) return false;
+    if(filter==='placeOnly' && place.kind!=='place') return false;
+  }
+  return true;
+}
+
+function updateFilterUI(){
+  filterChipsEl.querySelectorAll('button[data-filter]').forEach(btn=>{
+    const on=activeFilters.has(btn.dataset.filter);
+    btn.classList.toggle('active',on);
+    btn.setAttribute('aria-pressed',String(on));
+  });
+  filterStatusEl.textContent=activeFilters.size?`${activeFilters.size}個の条件で絞り込み中`:'条件指定なし';
+}
+
 function applyFilters(){
   const raw=searchInput.value.trim();
   const q=raw.toLowerCase();
   let items=places.filter(p=>{
     const categoryOK=!activeCategory || p.category===activeCategory;
     const favoriteOK=!showFavoritesOnly || favorites.has(p.id);
-    const hay=`${p.name} ${p.address||''} ${p.phone||''} ${p.desc||''} ${(p.tags||[]).join(' ')} ${p.source||''} ${categoryMap[p.category]?.name||''}`.toLowerCase();
-    return categoryOK && favoriteOK && (!q || hay.includes(q));
+    const hay=`${p.name} ${p.address||''} ${p.phone||''} ${p.desc||''} ${(p.tags||[]).join(' ')} ${p.source||''} ${p.area||''} ${p.openingHours||''} ${p.regularHoliday||''} ${p.priceNote||''} ${categoryMap[p.category]?.name||''}`.toLowerCase();
+    return categoryOK && favoriteOK && passesQuickFilters(p) && (!q || hay.includes(q));
   });
   items=sortedByMode(items);
 
@@ -361,14 +437,41 @@ function toggleFavorites(){
   document.getElementById('resultsSection').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-document.getElementById('searchButton').addEventListener('click',()=>{showFavoritesOnly=false;favoritesButton.classList.remove('active');applyFilters();document.getElementById('resultsSection').scrollIntoView({behavior:'smooth',block:'start'});});
+filterChipsEl.addEventListener('click',e=>{
+  const btn=e.target.closest('button[data-filter]');
+  if(!btn) return;
+  const key=btn.dataset.filter;
+  activeFilters.has(key)?activeFilters.delete(key):activeFilters.add(key);
+  updateFilterUI();
+  applyFilters();
+});
+
+document.getElementById('clearFiltersButton').addEventListener('click',()=>{
+  activeFilters.clear();
+  updateFilterUI();
+  applyFilters();
+});
+
+document.getElementById('searchButton').addEventListener('click',()=>{
+  showFavoritesOnly=false;
+  favoritesButton.classList.remove('active');
+  applyFilters();
+  document.getElementById('resultsSection').scrollIntoView({behavior:'smooth',block:'start'});
+});
 searchInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();document.getElementById('searchButton').click();}});
 document.getElementById('nearbyButton').addEventListener('click',locate);
 document.getElementById('mapLocateButton').addEventListener('click',locate);
 document.getElementById('favoritesButton').addEventListener('click',toggleFavorites);
 document.getElementById('bottomFavorite').addEventListener('click',toggleFavorites);
 document.getElementById('showAllButton').addEventListener('click',()=>{
-  activeCategory=null;showFavoritesOnly=false;searchInput.value='';favoritesButton.classList.remove('active');syncCategoryState();applyFilters();
+  activeCategory=null;
+  showFavoritesOnly=false;
+  searchInput.value='';
+  activeFilters.clear();
+  favoritesButton.classList.remove('active');
+  syncCategoryState();
+  updateFilterUI();
+  applyFilters();
 });
 document.getElementById('modeButton').addEventListener('click',toggleMode);
 document.getElementById('modeStripButton').addEventListener('click',toggleMode);
@@ -383,6 +486,7 @@ document.querySelectorAll('.bottom-nav [data-target]').forEach(btn=>btn.addEvent
 
 async function boot(){
   updateModeUI();
+  updateFilterUI();
   await loadRemotePlaces();
   renderCategories();
   renderDataSummary();

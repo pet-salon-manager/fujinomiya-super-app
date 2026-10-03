@@ -150,3 +150,11 @@ footer{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;color:
 .admin-link:hover{text-decoration:underline}
 .data-summary .source-badge{background:#e9f5ff;border-color:#cfe8f7;color:#2d637f}
 .data-summary .source-badge strong{color:#2d637f}
+
+/* v5: quick filters and richer place metadata */
+.filter-panel{margin:14px 0 18px;background:rgba(255,255,255,.72);border:1px solid var(--line);border-radius:20px;padding:14px;box-shadow:0 8px 24px rgba(31,76,63,.04);backdrop-filter:blur(12px)}
+.filter-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:10px}.filter-head h2{margin:3px 0 0;font-size:19px;letter-spacing:-.03em}.filter-clear{border:0;background:transparent;color:var(--green);font-size:12px;font-weight:900;padding:7px 8px}
+.filter-chips{display:flex;gap:7px;flex-wrap:wrap}.filter-chips button{border:1px solid var(--line);background:#fff;color:#405d55;border-radius:999px;padding:9px 11px;font-size:11px;font-weight:900}.filter-chips button.active{background:var(--green);border-color:var(--green);color:#fff}.filter-status{margin:8px 2px 0;color:var(--muted);font-size:10px}
+.detail-badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:9px}.detail-badges span{font-size:10px;border-radius:999px;padding:6px 8px;background:#eaf6f1;color:#0a6d50;border:1px solid rgba(10,91,70,.09)}
+.verification-row{margin-top:8px;font-size:10px;color:#57736a;background:#f7faf9;border:1px dashed rgba(10,91,70,.14);border-radius:10px;padding:7px 9px}
+@media(max-width:680px){.filter-panel{padding:12px;border-radius:18px;margin-top:10px}.filter-head h2{font-size:17px}.filter-chips{gap:6px}.filter-chips button{padding:8px 9px;font-size:10px}}

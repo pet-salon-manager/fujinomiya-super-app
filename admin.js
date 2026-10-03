@@ -13,8 +13,11 @@ let activeId = null;
 const $ = id => document.getElementById(id);
 const fields = {
   id:$('placeId'), name:$('placeName'), category:$('placeCategory'), kind:$('placeKind'),
-  published:$('placePublished'), address:$('placeAddress'), phone:$('placePhone'), site:$('placeSite'),
-  description:$('placeDescription'), tags:$('placeTags'), lat:$('placeLat'), lng:$('placeLng'),
+  published:$('placePublished'), address:$('placeAddress'), area:$('placeArea'), phone:$('placePhone'), site:$('placeSite'),
+  openingHours:$('placeOpeningHours'), regularHoliday:$('placeRegularHoliday'), description:$('placeDescription'), tags:$('placeTags'),
+  parking:$('placeParking'), parkingNote:$('placeParkingNote'), petFriendly:$('placePetFriendly'), wheelchair:$('placeWheelchair'), emergency24h:$('placeEmergency24h'),
+  bookingUrl:$('placeBookingUrl'), priceNote:$('placePriceNote'), imageUrl:$('placeImageUrl'),
+  lat:$('placeLat'), lng:$('placeLng'), verificationStatus:$('placeVerificationStatus'), lastVerified:$('placeLastVerified'),
   source:$('placeSource'), sortOrder:$('placeSortOrder')
 };
 
@@ -26,6 +29,18 @@ function setStatus(el,msg,type=''){
 
 function normalizeRow(row){
   return {...row, tags:Array.isArray(row.tags)?row.tags:[]};
+}
+
+function triStateToForm(value){
+  if(value===true) return 'true';
+  if(value===false) return 'false';
+  return 'unknown';
+}
+
+function formToTriState(value){
+  if(value==='true') return true;
+  if(value==='false') return false;
+  return null;
 }
 
 async function isAdmin(){
@@ -57,7 +72,7 @@ async function loadRows(){
 
 function renderList(){
   const q=adminSearch.value.trim().toLowerCase();
-  const filtered=rows.filter(r=>`${r.name} ${r.address||''} ${r.category||''} ${r.description||''}`.toLowerCase().includes(q));
+  const filtered=rows.filter(r=>`${r.name} ${r.address||''} ${r.area||''} ${r.category||''} ${r.description||''}`.toLowerCase().includes(q));
   adminCount.textContent=`${filtered.length}件`;
   adminList.innerHTML='';
   if(!filtered.length){adminList.innerHTML='<div class="empty">該当する登録情報がありません。</div>';return;}
@@ -66,7 +81,8 @@ function renderList(){
     b.type='button';
     b.className='admin-item';
     b.classList.toggle('active',row.id===activeId);
-    b.innerHTML=`<strong></strong><div class="admin-item-meta"><span>${row.category} / ${row.kind}</span><span class="publish-dot ${row.is_published?'on':'off'}">${row.is_published?'● 公開':'○ 非公開'}</span></div>`;
+    const verify = row.verification_status==='verified'?'✓ 確認済み':row.verification_status==='needs_review'?'要確認':'未確認';
+    b.innerHTML=`<strong></strong><div class="admin-item-meta"><span>${row.category} / ${row.kind}</span><span class="publish-dot ${row.is_published?'on':'off'}">${row.is_published?'● 公開':'○ 非公開'}</span></div><div class="admin-verify">${verify}</div>`;
     b.querySelector('strong').textContent=row.name;
     b.addEventListener('click',()=>editRow(row.id));
     adminList.appendChild(b);
@@ -76,8 +92,10 @@ function renderList(){
 function clearForm(){
   activeId=null;
   fields.id.value=''; fields.name.value=''; fields.category.value='food'; fields.kind.value='place'; fields.published.value='true';
-  fields.address.value=''; fields.phone.value=''; fields.site.value=''; fields.description.value=''; fields.tags.value='';
-  fields.lat.value=''; fields.lng.value=''; fields.source.value=''; fields.sortOrder.value='100';
+  fields.address.value=''; fields.area.value=''; fields.phone.value=''; fields.site.value=''; fields.openingHours.value=''; fields.regularHoliday.value='';
+  fields.description.value=''; fields.tags.value=''; fields.parking.value='unknown'; fields.parkingNote.value=''; fields.petFriendly.value='unknown';
+  fields.wheelchair.value='unknown'; fields.emergency24h.value='unknown'; fields.bookingUrl.value=''; fields.priceNote.value=''; fields.imageUrl.value='';
+  fields.lat.value=''; fields.lng.value=''; fields.verificationStatus.value='unverified'; fields.lastVerified.value=''; fields.source.value=''; fields.sortOrder.value='100';
   $('editorTitle').textContent='新規施設';
   $('deleteButton').hidden=true;
   setStatus(saveStatus,'');
@@ -89,8 +107,12 @@ function editRow(id){
   const row=rows.find(r=>r.id===id); if(!row) return;
   activeId=id;
   fields.id.value=row.id; fields.name.value=row.name||''; fields.category.value=row.category||'food'; fields.kind.value=row.kind||'place';
-  fields.published.value=String(row.is_published!==false); fields.address.value=row.address||''; fields.phone.value=row.phone||''; fields.site.value=row.site||'';
-  fields.description.value=row.description||''; fields.tags.value=(row.tags||[]).join(', '); fields.lat.value=row.lat??''; fields.lng.value=row.lng??'';
+  fields.published.value=String(row.is_published!==false); fields.address.value=row.address||''; fields.area.value=row.area||''; fields.phone.value=row.phone||''; fields.site.value=row.site||'';
+  fields.openingHours.value=row.opening_hours||''; fields.regularHoliday.value=row.regular_holiday||''; fields.description.value=row.description||''; fields.tags.value=(row.tags||[]).join(', ');
+  fields.parking.value=triStateToForm(row.parking); fields.parkingNote.value=row.parking_note||''; fields.petFriendly.value=triStateToForm(row.pet_friendly);
+  fields.wheelchair.value=triStateToForm(row.wheelchair_accessible); fields.emergency24h.value=triStateToForm(row.emergency_24h);
+  fields.bookingUrl.value=row.booking_url||''; fields.priceNote.value=row.price_note||''; fields.imageUrl.value=row.image_url||'';
+  fields.lat.value=row.lat??''; fields.lng.value=row.lng??''; fields.verificationStatus.value=row.verification_status||'unverified'; fields.lastVerified.value=row.last_verified||'';
   fields.source.value=row.source||''; fields.sortOrder.value=row.sort_order??100;
   $('editorTitle').textContent='施設を編集';
   $('deleteButton').hidden=false;
@@ -107,12 +129,25 @@ function payloadFromForm(){
     kind:fields.kind.value,
     is_published:fields.published.value==='true',
     address:fields.address.value.trim() || null,
+    area:fields.area.value.trim() || null,
     phone:fields.phone.value.trim() || null,
     site:fields.site.value.trim() || null,
+    opening_hours:fields.openingHours.value.trim() || null,
+    regular_holiday:fields.regularHoliday.value.trim() || null,
     description:fields.description.value.trim() || null,
     tags:fields.tags.value.split(',').map(x=>x.trim()).filter(Boolean),
+    parking:formToTriState(fields.parking.value),
+    parking_note:fields.parkingNote.value.trim() || null,
+    pet_friendly:formToTriState(fields.petFriendly.value),
+    wheelchair_accessible:formToTriState(fields.wheelchair.value),
+    emergency_24h:formToTriState(fields.emergency24h.value),
+    booking_url:fields.bookingUrl.value.trim() || null,
+    price_note:fields.priceNote.value.trim() || null,
+    image_url:fields.imageUrl.value.trim() || null,
     lat:lat===''?null:Number(lat),
     lng:lng===''?null:Number(lng),
+    verification_status:fields.verificationStatus.value,
+    last_verified:fields.lastVerified.value || null,
     source:fields.source.value.trim() || null,
     sort_order:Number(fields.sortOrder.value || 100)
   };
@@ -131,7 +166,7 @@ $('loginForm').addEventListener('submit',async e=>{
 $('placeForm').addEventListener('submit',async e=>{
   e.preventDefault();
   const payload=payloadFromForm();
-  const saveButton=e.submitter || e.currentTarget.querySelector('button[type=\"submit\"]');
+  const saveButton=e.submitter || e.currentTarget.querySelector('button[type="submit"]');
 
   if(!payload.name){
     setStatus(saveStatus,'名称を入力してください。','error');
@@ -153,11 +188,7 @@ $('placeForm').addEventListener('submit',async e=>{
     if(error) throw error;
 
     activeId=payload.id;
-    const {data,error:reloadError}=await db.client
-      .from('places')
-      .select('*')
-      .order('sort_order',{ascending:true})
-      .order('name',{ascending:true});
+    const {data,error:reloadError}=await db.client.from('places').select('*').order('sort_order',{ascending:true}).order('name',{ascending:true});
     if(reloadError) throw reloadError;
 
     rows=(data||[]).map(normalizeRow);
@@ -167,7 +198,9 @@ $('placeForm').addEventListener('submit',async e=>{
     saveStatus.scrollIntoView({behavior:'smooth',block:'center'});
   }catch(err){
     console.error('Save failed',err);
-    setStatus(saveStatus,`保存できませんでした: ${err.message || err}`,'error');
+    const message=String(err?.message || err);
+    const extra=message.includes('column')?' migration_v5.sql を先に実行したか確認してください。':'';
+    setStatus(saveStatus,`保存できませんでした: ${message}${extra}`,'error');
     saveStatus.scrollIntoView({behavior:'smooth',block:'center'});
   }finally{
     if(saveButton){ saveButton.disabled=false; saveButton.textContent=originalText; }

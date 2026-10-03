@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0a5b46" />
   <title>管理者 | 富士宮まるごと</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="admin.css" />
+  <link rel="stylesheet" href="styles.css?v=20261003-v5" />
+  <link rel="stylesheet" href="admin.css?v=20261003-v5" />
 </head>
 <body class="admin-body">
   <main class="admin-shell">
@@ -20,7 +20,7 @@
 
     <section id="setupNotice" class="notice" hidden>
       <strong>Supabaseが未接続です。</strong>
-      <p><code>config.js</code> に Project URL と Publishable/anon key を設定してください。設定手順は同梱の <code>SUPABASE_SETUP.md</code> にあります。</p>
+      <p><code>config.js</code> に Project URL と Publishable/anon key を設定してください。</p>
     </section>
 
     <section id="loginPanel" class="admin-card login-card">
@@ -92,17 +92,68 @@
                 <select id="placePublished"><option value="true">公開</option><option value="false">非公開</option></select>
               </label>
             </div>
-            <label>住所<input id="placeAddress"></label>
+
+            <div class="form-grid two">
+              <label>住所<input id="placeAddress"></label>
+              <label>エリア<input id="placeArea" placeholder="市街地・朝霧高原など"></label>
+            </div>
             <div class="form-grid two">
               <label>電話番号<input id="placePhone" inputmode="tel"></label>
               <label>公式HP / 公式SNS<input id="placeSite" type="url" placeholder="https://..."></label>
             </div>
+            <div class="form-grid two">
+              <label>営業時間<input id="placeOpeningHours" placeholder="例 9:00〜17:00"></label>
+              <label>定休日<input id="placeRegularHoliday" placeholder="例 火曜・年末年始"></label>
+            </div>
             <label>説明<textarea id="placeDescription" rows="4"></textarea></label>
             <label>検索タグ <small>カンマ区切り</small><input id="placeTags" placeholder="富士山, 観光, カフェ"></label>
+
+            <fieldset class="admin-fieldset">
+              <legend>利用条件・設備</legend>
+              <div class="form-grid three">
+                <label>駐車場
+                  <select id="placeParking"><option value="unknown">未確認</option><option value="true">あり</option><option value="false">なし</option></select>
+                </label>
+                <label>ペット同伴
+                  <select id="placePetFriendly"><option value="unknown">未確認</option><option value="true">可</option><option value="false">不可</option></select>
+                </label>
+                <label>バリアフリー
+                  <select id="placeWheelchair"><option value="unknown">未確認</option><option value="true">対応</option><option value="false">非対応</option></select>
+                </label>
+              </div>
+              <div class="form-grid two">
+                <label>24時間・緊急対応
+                  <select id="placeEmergency24h"><option value="unknown">未確認</option><option value="true">対応</option><option value="false">非対応</option></select>
+                </label>
+                <label>駐車場補足<input id="placeParkingNote" placeholder="無料20台、提携駐車場など"></label>
+              </div>
+            </fieldset>
+
+            <div class="form-grid two">
+              <label>予約・受付URL<input id="placeBookingUrl" type="url" placeholder="https://..."></label>
+              <label>料金・価格補足<input id="placePriceNote" placeholder="入館無料・料金目安など"></label>
+            </div>
+            <label>写真URL <small>権利を確認できる画像のみ</small><input id="placeImageUrl" type="url" placeholder="https://..."></label>
+
             <div class="form-grid two">
               <label>緯度<input id="placeLat" type="number" step="any" placeholder="35.000000"></label>
               <label>経度<input id="placeLng" type="number" step="any" placeholder="138.000000"></label>
             </div>
+
+            <fieldset class="admin-fieldset">
+              <legend>情報確認</legend>
+              <div class="form-grid two">
+                <label>確認状態
+                  <select id="placeVerificationStatus">
+                    <option value="unverified">未確認</option>
+                    <option value="needs_review">再確認が必要</option>
+                    <option value="verified">確認済み</option>
+                  </select>
+                </label>
+                <label>最終確認日<input id="placeLastVerified" type="date"></label>
+              </div>
+            </fieldset>
+
             <div class="form-grid two">
               <label>情報元<input id="placeSource" placeholder="公式サイト"></label>
               <label>並び順<input id="placeSortOrder" type="number" step="1" value="100"></label>
@@ -119,8 +170,8 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config.js"></script>
-  <script src="supabase-client.js"></script>
-  <script src="admin.js"></script>
+  <script src="config.js?v=20261003-v5"></script>
+  <script src="supabase-client.js?v=20261003-v5"></script>
+  <script src="admin.js?v=20261003-v5"></script>
 </body>
 </html>

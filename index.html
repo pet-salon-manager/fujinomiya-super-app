@@ -13,7 +13,7 @@
   <title>富士宮まるごと | FUJINOMIYA ONE</title>
   <link rel="preconnect" href="https://unpkg.com" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=20261003-0744" />
+  <link rel="stylesheet" href="styles.css?v=20261003-v5" />
 </head>
 <body>
   <div class="app-shell" id="home">
@@ -59,6 +59,27 @@
           <span id="modeDescription">医療・買い物・行政・防災などを上位に表示します。</span>
         </div>
         <button id="modeStripButton" type="button">観光モードへ</button>
+      </section>
+
+      <section class="filter-panel" aria-labelledby="filterTitle">
+        <div class="filter-head">
+          <div>
+            <span class="eyebrow">QUICK FILTERS</span>
+            <h2 id="filterTitle">条件で絞り込む</h2>
+          </div>
+          <button id="clearFiltersButton" class="filter-clear" type="button">条件を解除</button>
+        </div>
+        <div id="filterChips" class="filter-chips">
+          <button type="button" data-filter="phone">☎ 電話あり</button>
+          <button type="button" data-filter="web">↗ 公式サイト</button>
+          <button type="button" data-filter="map">⌖ 地図ピン</button>
+          <button type="button" data-filter="parking">🅿 駐車場あり</button>
+          <button type="button" data-filter="pets">🐾 ペット可</button>
+          <button type="button" data-filter="wheelchair">♿ バリアフリー</button>
+          <button type="button" data-filter="emergency">24h 緊急対応</button>
+          <button type="button" data-filter="placeOnly">施設・場所のみ</button>
+        </div>
+        <p id="filterStatus" class="filter-status">条件指定なし</p>
       </section>
 
       <section class="category-section" aria-labelledby="categoryTitle">
@@ -124,7 +145,9 @@
       <h3></h3>
       <p class="description"></p>
       <div class="meta"></div>
+      <div class="detail-badges"></div>
       <div class="tags"></div>
+      <div class="verification-row" hidden></div>
       <div class="source-row"><span class="source-label"></span></div>
       <div class="contact-actions"></div>
       <div class="card-actions">
@@ -136,8 +159,8 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config.js?v=20261003-0744"></script>
-  <script src="data.js?v=20261003-0744"></script>
-  <script src="app-live.js?v=20261003-0825"></script>
+  <script src="config.js?v=20261003-v5"></script>
+  <script src="data.js?v=20261003-v5"></script>
+  <script src="app-live.js?v=20261003-v5"></script>
 </body>
 </html>
