@@ -13,7 +13,7 @@
   <title>富士宮まるごと | FUJINOMIYA ONE</title>
   <link rel="preconnect" href="https://unpkg.com" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=20261003-v18" />
+  <link rel="stylesheet" href="styles.css?v=20261004-v19" />
 </head>
 <body>
   <div class="app-shell" id="home">
@@ -31,9 +31,11 @@
           <strong>富士宮まるごと</strong>
         </span>
       </button>
-      <button class="mode-btn" id="modeButton" type="button" aria-label="市民・観光モード切り替え">
-        <span id="modeIcon">🏠</span><span id="modeLabel">市民</span><span class="mode-arrow" aria-hidden="true">›</span>
-      </button>
+      <a class="talk-entry-btn" href="talk.html" aria-label="富士宮トークを開く">
+        <span class="talk-entry-icon" aria-hidden="true">💬</span>
+        <span class="talk-entry-copy"><strong>トーク</strong><small>富士宮トーク</small></span>
+        <span class="talk-entry-arrow" aria-hidden="true">›</span>
+      </a>
     </header>
 
     <main>
@@ -181,7 +183,7 @@
     <button type="button" data-target="searchSection"><span>⌕</span><small>検索</small></button>
     <button type="button" data-target="mapSection"><span>⌖</span><small>地図</small></button>
     <button type="button" id="bottomFavorite"><span>♡</span><small>お気に入り</small></button>
-    <button type="button" id="bottomMode"><span>⇄</span><small>モード</small></button>
+    <a class="bottom-talk-link" href="talk.html"><span>💬</span><small>トーク</small></a>
   </nav>
 
   <template id="cardTemplate">
@@ -212,6 +214,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js?v=20261003-v9"></script>
   <script src="data.js?v=20261003-v9"></script>
-  <script src="app-live.js?v=20261003-v18"></script>
+  <script src="app-live.js?v=20261004-v19"></script>
 </body>
 </html>

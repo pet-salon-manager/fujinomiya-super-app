@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#58c4f3" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>富士宮トーク | 富士宮まるごと</title>
+  <link rel="stylesheet" href="talk.css?v=20261004-v19" />
+</head>
+<body>
+  <div class="talk-app">
+    <header class="talk-header">
+      <a class="back-btn" href="index.html" aria-label="ホームに戻る">‹</a>
+      <div class="talk-title">
+        <span class="mini-mark">💬</span>
+        <div><strong>富士宮トーク</strong><small><span class="online-dot"></span> まち案内チャット</small></div>
+      </div>
+      <button class="share-btn" id="shareTalk" type="button" aria-label="トークを共有">↗</button>
+    </header>
+
+    <section class="channel-strip" aria-label="トークの種類">
+      <button class="channel active" data-channel="guide" type="button"><span>🗻</span><strong>旅とも案内</strong><small>富士宮を探す</small></button>
+      <button class="channel" data-channel="friend" type="button"><span>👥</span><strong>友だち</strong><small>予定を相談</small></button>
+      <button class="channel" data-channel="shop" type="button"><span>🏪</span><strong>お店</strong><small>質問テンプレ</small></button>
+    </section>
+
+    <main class="chat-stage">
+      <div class="chat-headline">
+        <div class="avatar" id="channelAvatar">🗻</div>
+        <div><h1 id="channelTitle">旅とも案内</h1><p id="channelSubtitle">富士宮の観光・暮らしをチャット形式で案内します。</p></div>
+      </div>
+
+      <div class="messages" id="messages" aria-live="polite"></div>
+
+      <section class="quick-panel" id="quickPanel">
+        <div class="quick-title"><strong>すぐに聞く</strong><span>タップで送信</span></div>
+        <div class="quick-grid" id="quickGrid"></div>
+      </section>
+    </main>
+
+    <form class="composer" id="composer">
+      <button class="plus-btn" id="clearTalk" type="button" aria-label="トークをリセット">＋</button>
+      <label class="composer-field"><span class="sr-only">メッセージ</span><input id="messageInput" autocomplete="off" placeholder="メッセージを入力" /></label>
+      <button class="send-btn" type="submit">送信</button>
+    </form>
+  </div>
+  <script src="talk.js?v=20261004-v19"></script>
+</body>
+</html>

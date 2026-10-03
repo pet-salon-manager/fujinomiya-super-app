@@ -573,8 +573,6 @@ function locate(){
 
 function updateModeUI(){
   const resident=mode==='resident';
-  document.getElementById('modeIcon').textContent=resident?'🏠':'🗻';
-  document.getElementById('modeLabel').textContent=resident?'市民':'観光';
   document.getElementById('heroModeBadge').textContent=resident?'市民モード':'観光モード';
   document.getElementById('modeTitle').textContent=resident?'暮らしに便利な情報を優先':'旅行に便利な情報を優先';
   document.getElementById('modeDescription').textContent=resident?'医療・買い物・行政・防災などを上位に表示します。':'観光・グルメ・宿泊・移動などを上位に表示します。';
@@ -713,9 +711,7 @@ document.getElementById('showAllButton').addEventListener('click',()=>{
   updateFilterUI();
   applyFilters();
 });
-document.getElementById('modeButton').addEventListener('click',toggleMode);
 document.getElementById('modeStripButton').addEventListener('click',toggleMode);
-document.getElementById('bottomMode').addEventListener('click',toggleMode);
 document.getElementById('homeBrand').addEventListener('click',()=>document.getElementById('home').scrollIntoView({behavior:'smooth'}));
 document.querySelectorAll('.bottom-nav [data-target]').forEach(btn=>btn.addEventListener('click',()=>{
   const target=document.getElementById(btn.dataset.target);

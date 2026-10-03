@@ -716,3 +716,37 @@ body:before{
   .category-card:nth-child(11),
   .category-card:nth-child(12){min-height:116px!important}
 }
+
+
+/* v19: 富士宮トーク入口 */
+.talk-entry-btn{
+  min-width:150px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 12px 10px 11px;
+  border:1px solid rgba(255,255,255,.84);
+  border-radius:999px;
+  color:#0b355b;
+  background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(237,249,255,.94));
+  box-shadow:0 9px 20px rgba(53,132,180,.18),inset 0 1px 0 rgba(255,255,255,.95),inset 0 -2px 4px rgba(59,146,199,.08);
+  backdrop-filter:blur(14px);
+  text-decoration:none;
+  transition:.16s transform,.16s box-shadow;
+}
+.talk-entry-btn:active{transform:translateY(2px);box-shadow:0 4px 9px rgba(53,132,180,.16),inset 0 2px 4px rgba(59,146,199,.12)}
+.talk-entry-icon{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:linear-gradient(180deg,#67d1ff,#22ace9);box-shadow:0 5px 11px rgba(20,159,218,.26),inset 0 1px 0 rgba(255,255,255,.65);font-size:18px}
+.talk-entry-copy{display:flex;flex-direction:column;line-height:1.08;min-width:0}
+.talk-entry-copy strong{font-size:14px;letter-spacing:-.02em}
+.talk-entry-copy small{font-size:9px;color:#6d8aa0;font-weight:800;margin-top:3px;white-space:nowrap}
+.talk-entry-arrow{margin-left:auto;color:#268fc4;font-size:24px;line-height:1}
+.bottom-nav .bottom-talk-link{border:0;background:transparent;color:#506f84;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:14px;min-width:0;text-decoration:none}
+.bottom-nav .bottom-talk-link:active{background:#edf8ff}
+.bottom-nav .bottom-talk-link span{font-size:21px;line-height:1}
+.bottom-nav .bottom-talk-link small{font-size:10px;font-weight:900;white-space:nowrap}
+@media(max-width:680px){
+  .talk-entry-btn{min-width:112px;padding:8px 10px}
+  .talk-entry-icon{width:30px;height:30px;font-size:16px}
+  .talk-entry-copy strong{font-size:12px}
+  .talk-entry-copy small{display:none}
+}
