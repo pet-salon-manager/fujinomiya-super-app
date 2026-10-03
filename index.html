@@ -13,7 +13,7 @@
   <title>富士宮まるごと | FUJINOMIYA ONE</title>
   <link rel="preconnect" href="https://unpkg.com" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=20261003-v13" />
+  <link rel="stylesheet" href="styles.css?v=20261003-v14" />
 </head>
 <body>
   <div class="app-shell" id="home">
@@ -38,20 +38,7 @@
         <div class="mountain" aria-hidden="true"></div>
       </section>
 
-      <section class="search-panel" id="searchSection" aria-label="検索">
-        <label class="search-box" for="globalSearch">
-          <span aria-hidden="true">🔎</span>
-          <input id="globalSearch" type="search" placeholder="富士宮焼きそば、病院、温泉、駐車場…" autocomplete="off" />
-        </label>
-        <button id="searchButton" class="primary-btn" type="button">検索</button>
-        <div class="quick-actions">
-          <button id="nearbyButton" class="secondary-btn" type="button">📍 現在地から探す</button>
-          <button id="favoritesButton" class="secondary-btn" type="button">♡ お気に入り</button>
-          <button id="showAllButton" class="secondary-btn" type="button">すべて表示</button>
-        </div>
-        <div id="statusMessage" class="status" role="status" aria-live="polite"></div>
-        <div class="data-summary" id="dataSummary" aria-label="登録データ概要"></div>
-      </section>
+
 
       <section class="mode-strip" aria-label="おすすめ切り替え">
         <div>
@@ -93,6 +80,21 @@
           <span class="hint">タップで絞り込み</span>
         </div>
         <nav class="category-grid" id="categoryGrid" aria-label="カテゴリー"></nav>
+      </section>
+
+      <section class="search-panel" id="searchSection" aria-label="検索">
+        <label class="search-box" for="globalSearch">
+          <span aria-hidden="true">🔎</span>
+          <input id="globalSearch" type="search" placeholder="富士宮焼きそば、病院、温泉、駐車場…" autocomplete="off" />
+        </label>
+        <button id="searchButton" class="primary-btn" type="button">検索</button>
+        <div class="quick-actions">
+          <button id="nearbyButton" class="secondary-btn" type="button">📍 現在地から探す</button>
+          <button id="favoritesButton" class="secondary-btn" type="button">♡ お気に入り</button>
+          <button id="showAllButton" class="secondary-btn" type="button">すべて表示</button>
+        </div>
+        <div id="statusMessage" class="status" role="status" aria-live="polite"></div>
+        <div class="data-summary" id="dataSummary" aria-label="登録データ概要" hidden></div>
       </section>
 
       <section class="content-grid" id="resultsSection">
@@ -191,6 +193,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js?v=20261003-v9"></script>
   <script src="data.js?v=20261003-v9"></script>
-  <script src="app-live.js?v=20261003-v13"></script>
+  <script src="app-live.js?v=20261003-v14"></script>
 </body>
 </html>

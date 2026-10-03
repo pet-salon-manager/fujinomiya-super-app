@@ -460,3 +460,36 @@ footer{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;color:
   .mobility-nearby-btn{width:100%}
   .mobility-subfilters{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+
+/* v14: LINE風ホーム配置 - カテゴリーの下に検索 */
+.data-summary{display:none!important}
+.category-section{margin-bottom:14px}
+.search-panel{
+  margin:0 0 14px;
+  position:relative;
+  z-index:2;
+  border-radius:22px;
+  padding:14px;
+  background:rgba(255,255,255,.92);
+  border:1px solid rgba(207,228,220,.95);
+  box-shadow:0 10px 28px rgba(29,76,62,.08);
+  backdrop-filter:blur(16px);
+}
+.search-box{
+  border-radius:18px;
+  min-height:52px;
+  background:#f7faf9;
+  border:1px solid #d8e6e0;
+}
+.search-box:focus-within{
+  background:#fff;
+  border-color:#79b8a4;
+  box-shadow:0 0 0 3px rgba(10,137,92,.10);
+}
+.quick-actions{margin-top:2px}
+@media(max-width:680px){
+  .category-section{margin-bottom:12px}
+  .search-panel{margin:0 0 12px;border-radius:20px;padding:12px}
+  .search-box{min-height:50px;border-radius:16px}
+}

@@ -201,6 +201,7 @@ function renderCategories(){
 }
 
 function renderDataSummary(){
+  if(!summaryEl) return;
   const pinCount=places.filter(hasCoords).length;
   const realPlaces=places.filter(p=>p.kind==='place').length;
   const phoneCount=places.filter(p=>p.phone).length;
