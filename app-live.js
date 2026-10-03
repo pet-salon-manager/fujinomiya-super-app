@@ -100,7 +100,8 @@ function mapDbRow(row){
     priceNote:row.price_note || '',
     imageUrl:row.image_url || '',
     lastVerified:row.last_verified || '',
-    verificationStatus:row.verification_status || 'unverified'
+    verificationStatus:row.verification_status || 'unverified',
+    sortOrder:Number.isFinite(Number(row.sort_order)) ? Number(row.sort_order) : 999999
   };
 }
 
@@ -251,27 +252,33 @@ function sortedByMode(items){
 
 
 function sortItems(items){
+  const byName=(a,b)=>String(a.name || '').localeCompare(String(b.name || ''),'ja',{numeric:true,sensitivity:'base'});
+  const bySortOrder=(a,b)=>(Number(a.sortOrder ?? 999999)-Number(b.sortOrder ?? 999999)) || byName(a,b);
+
   if(sortMode==='name'){
-    return [...items].sort((a,b)=>a.name.localeCompare(b.name,'ja'));
+    return [...items].sort(byName);
   }
+
   if(sortMode==='verified'){
+    const rank={verified:0,needs_review:1,unverified:2};
     return [...items].sort((a,b)=>{
-      const av=a.verificationStatus==='verified'?0:1;
-      const bv=b.verificationStatus==='verified'?0:1;
-      if(av!==bv) return av-bv;
-      return a.name.localeCompare(b.name,'ja');
+      const av=rank[a.verificationStatus] ?? 3;
+      const bv=rank[b.verificationStatus] ?? 3;
+      return (av-bv) || bySortOrder(a,b);
     });
   }
+
   if(sortMode==='nearby'){
-    if(!userLocation) return sortedByMode(items);
+    if(!userLocation) return [...items].sort(bySortOrder);
     return [...items].sort((a,b)=>{
       const da=hasCoords(a)?haversine(userLocation,a):Infinity;
       const db=hasCoords(b)?haversine(userLocation,b):Infinity;
-      if(da!==db) return da-db;
-      return a.name.localeCompare(b.name,'ja');
+      return (da-db) || byName(a,b);
     });
   }
-  return sortedByMode(items);
+
+  // おすすめ順 = Supabaseの sort_order をそのまま優先
+  return [...items].sort(bySortOrder);
 }
 
 function addBadge(container,text,className=''){
@@ -548,10 +555,23 @@ sortSelect.value=sortMode;
 sortSelect.addEventListener('change',()=>{
   sortMode=sortSelect.value;
   localStorage.setItem('fujinomiya-sort',sortMode);
+
+  const labels={
+    recommended:'おすすめ順',
+    name:'名前順',
+    verified:'確認済み優先',
+    nearby:'現在地から近い順'
+  };
+
   if(sortMode==='nearby' && !userLocation){
-    statusEl.textContent='「現在地から近い順」は位置情報を取得すると有効になります。';
+    statusEl.textContent='現在地を取得して、近い順に並べ替えます…';
+    locate();
+    return;
   }
+
+  statusEl.textContent=`並び順を「${labels[sortMode] || 'おすすめ順'}」に変更しました。`;
   applyFilters();
+  document.getElementById('resultsSection').scrollIntoView({behavior:'smooth',block:'start'});
 });
 
 prevPageButton.addEventListener('click',()=>{
