@@ -36,7 +36,10 @@ const filterStatusEl = document.getElementById('filterStatus');
 const filterChipsEl = document.getElementById('filterChips');
 const resultsMetaEl = document.getElementById('resultsMeta');
 const sortSelect = document.getElementById('sortSelect');
-const loadMoreButton = document.getElementById('loadMoreButton');
+const paginationEl = document.getElementById('pagination');
+const prevPageButton = document.getElementById('prevPageButton');
+const nextPageButton = document.getElementById('nextPageButton');
+const pageIndicator = document.getElementById('pageIndicator');
 
 let activeCategory = null;
 let userLocation = null;
@@ -46,9 +49,9 @@ let showFavoritesOnly = false;
 let mode = localStorage.getItem('fujinomiya-mode') || 'resident';
 let favorites = new Set(JSON.parse(localStorage.getItem('fujinomiya-favorites') || '[]'));
 const activeFilters = new Set();
-const PAGE_SIZE = 30;
+const PAGE_SIZE = 10;
 const MAP_MARKER_LIMIT = 120;
-let visibleLimit = PAGE_SIZE;
+let currentPage = 1;
 let currentResults = [];
 let sortMode = localStorage.getItem('fujinomiya-sort') || 'recommended';
 let searchTimer = null;
@@ -280,7 +283,7 @@ function addBadge(container,text,className=''){
 
 function render(items){
   currentResults=[...items];
-  visibleLimit=Math.min(PAGE_SIZE,currentResults.length);
+  currentPage=1;
   renderCurrentResults();
 }
 
@@ -290,13 +293,20 @@ function renderCurrentResults(){
   markers=[];
 
   const total=currentResults.length;
-  const visibleItems=currentResults.slice(0,visibleLimit);
+  const totalPages=Math.max(1,Math.ceil(total/PAGE_SIZE));
+  if(currentPage>totalPages) currentPage=totalPages;
+  if(currentPage<1) currentPage=1;
+  const start=(currentPage-1)*PAGE_SIZE;
+  const end=Math.min(start+PAGE_SIZE,total);
+  const visibleItems=currentResults.slice(start,end);
   countEl.textContent=`${total}件`;
-  resultsMetaEl.textContent=total?`全${total}件中 ${visibleItems.length}件を表示`:'0件';
+  resultsMetaEl.textContent=total
+    ? `全${total}件中 ${start+1}〜${end}件を表示（${currentPage}/${totalPages}ページ）`
+    : '0件';
 
   if(!total){
     cardsEl.innerHTML='<div class="empty">該当する情報がありません。検索語・カテゴリー・絞り込み条件を変えてみてください。</div>';
-    loadMoreButton.hidden=true;
+    paginationEl.hidden=true;
     return;
   }
 
@@ -425,11 +435,10 @@ function renderCurrentResults(){
   if(bounds.length>1 && !userLocation) map.fitBounds(bounds,{padding:[24,24],maxZoom:13});
   else if(bounds.length===1 && !userLocation) map.setView(bounds[0],14);
 
-  loadMoreButton.hidden=visibleLimit>=total;
-  if(!loadMoreButton.hidden){
-    const remain=total-visibleLimit;
-    loadMoreButton.textContent=`もっと見る（残り${remain}件）`;
-  }
+  paginationEl.hidden=false;
+  pageIndicator.textContent=`${currentPage} / ${totalPages}`;
+  prevPageButton.disabled=currentPage<=1;
+  nextPageButton.disabled=currentPage>=totalPages;
 }
 
 function passesQuickFilters(place){
@@ -545,9 +554,19 @@ sortSelect.addEventListener('change',()=>{
   applyFilters();
 });
 
-loadMoreButton.addEventListener('click',()=>{
-  visibleLimit=Math.min(visibleLimit+PAGE_SIZE,currentResults.length);
+prevPageButton.addEventListener('click',()=>{
+  if(currentPage<=1) return;
+  currentPage-=1;
   renderCurrentResults();
+  document.getElementById('resultsSection').scrollIntoView({behavior:'smooth',block:'start'});
+});
+
+nextPageButton.addEventListener('click',()=>{
+  const totalPages=Math.max(1,Math.ceil(currentResults.length/PAGE_SIZE));
+  if(currentPage>=totalPages) return;
+  currentPage+=1;
+  renderCurrentResults();
+  document.getElementById('resultsSection').scrollIntoView({behavior:'smooth',block:'start'});
 });
 
 searchInput.addEventListener('input',()=>{
