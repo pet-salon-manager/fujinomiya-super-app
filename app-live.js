@@ -34,6 +34,10 @@ const template = document.getElementById('cardTemplate');
 const favoritesButton = document.getElementById('favoritesButton');
 const filterStatusEl = document.getElementById('filterStatus');
 const filterChipsEl = document.getElementById('filterChips');
+const filterToggleButton = document.getElementById('filterToggleButton');
+const filterContent = document.getElementById('filterContent');
+const filterToggleCount = document.getElementById('filterToggleCount');
+const filterChevron = document.getElementById('filterChevron');
 const resultsMetaEl = document.getElementById('resultsMeta');
 const sortSelect = document.getElementById('sortSelect');
 const mobilityTools = document.getElementById('mobilityTools');
@@ -481,6 +485,9 @@ function updateFilterUI(){
     btn.setAttribute('aria-pressed',String(on));
   });
   filterStatusEl.textContent=activeFilters.size?`${activeFilters.size}個の条件で絞り込み中`:'条件指定なし';
+  filterToggleCount.textContent=String(activeFilters.size);
+  filterToggleCount.hidden=activeFilters.size===0;
+  filterToggleButton.classList.toggle('has-active-filters',activeFilters.size>0);
 }
 
 
@@ -590,6 +597,13 @@ function toggleFavorites(){
   applyFilters();
   document.getElementById('resultsSection').scrollIntoView({behavior:'smooth',block:'start'});
 }
+
+filterToggleButton.addEventListener('click',()=>{
+  const willOpen=filterContent.hidden;
+  filterContent.hidden=!willOpen;
+  filterToggleButton.setAttribute('aria-expanded',String(willOpen));
+  filterChevron.textContent=willOpen?'⌃':'⌄';
+});
 
 filterChipsEl.addEventListener('click',e=>{
   const btn=e.target.closest('button[data-filter]');
