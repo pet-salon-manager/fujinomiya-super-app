@@ -36,6 +36,12 @@ const filterStatusEl = document.getElementById('filterStatus');
 const filterChipsEl = document.getElementById('filterChips');
 const resultsMetaEl = document.getElementById('resultsMeta');
 const sortSelect = document.getElementById('sortSelect');
+const mobilityTools = document.getElementById('mobilityTools');
+const mobilityNearbyButton = document.getElementById('mobilityNearbyButton');
+const mobilityCountAll = document.getElementById('mobilityCountAll');
+const mobilityCountRail = document.getElementById('mobilityCountRail');
+const mobilityCountBus = document.getElementById('mobilityCountBus');
+const mobilityCountTaxi = document.getElementById('mobilityCountTaxi');
 const paginationEl = document.getElementById('pagination');
 const prevPageButton = document.getElementById('prevPageButton');
 const nextPageButton = document.getElementById('nextPageButton');
@@ -54,6 +60,7 @@ const MAP_MARKER_LIMIT = 120;
 let currentPage = 1;
 let currentResults = [];
 let sortMode = localStorage.getItem('fujinomiya-sort') || 'recommended';
+let mobilitySubtype = 'all';
 let searchTimer = null;
 
 const map = L.map('map', {zoomControl:true}).setView([35.229,138.61], 12);
@@ -181,9 +188,11 @@ function renderCategories(){
     btn.innerHTML=`<span class="icon">${cat.icon}</span><span class="name">${cat.name}</span><span class="cat-count">${count}件</span>`;
     btn.addEventListener('click',()=>{
       activeCategory = activeCategory===cat.id ? null : cat.id;
+      if(activeCategory!=='mobility') mobilitySubtype='all';
       showFavoritesOnly=false;
       favoritesButton.classList.remove('active');
       syncCategoryState();
+      updateMobilityTools();
       applyFilters();
       document.getElementById('resultsSection').scrollIntoView({behavior:'smooth',block:'start'});
     });
@@ -473,6 +482,47 @@ function updateFilterUI(){
   filterStatusEl.textContent=activeFilters.size?`${activeFilters.size}個の条件で絞り込み中`:'条件指定なし';
 }
 
+
+function mobilitySubtypeOf(place){
+  const tags=(place.tags || []).map(normalizeText);
+  const name=normalizeText(place.name);
+  const hay=[name,...tags].join(' ');
+
+  if(hay.includes('タクシー') || hay.includes('配車')) return 'taxi';
+  if(hay.includes('バス') || hay.includes('コミュニティバス') || hay.includes('路線バス')) return 'bus';
+  if(hay.includes('鉄道') || hay.includes('jr') || hay.includes('身延線') || /駅$/.test(String(place.name || ''))) return 'rail';
+  return 'other';
+}
+
+function updateMobilityTools(){
+  const on=activeCategory==='mobility';
+  mobilityTools.hidden=!on;
+  if(!on) return;
+
+  const mobilityPlaces=places.filter(p=>p.category==='mobility');
+  const counts={all:mobilityPlaces.length,rail:0,bus:0,taxi:0};
+  mobilityPlaces.forEach(p=>{
+    const type=mobilitySubtypeOf(p);
+    if(type in counts) counts[type]+=1;
+  });
+
+  mobilityCountAll.textContent=counts.all;
+  mobilityCountRail.textContent=counts.rail;
+  mobilityCountBus.textContent=counts.bus;
+  mobilityCountTaxi.textContent=counts.taxi;
+
+  mobilityTools.querySelectorAll('button[data-mobility]').forEach(btn=>{
+    const active=btn.dataset.mobility===mobilitySubtype;
+    btn.classList.toggle('active',active);
+    btn.setAttribute('aria-pressed',String(active));
+  });
+}
+
+function passesMobilitySubtype(place){
+  if(activeCategory!=='mobility' || mobilitySubtype==='all') return true;
+  return mobilitySubtypeOf(place)===mobilitySubtype;
+}
+
 function applyFilters(){
   const raw=searchInput.value.trim();
   const terms=normalizeText(raw).split(' ').filter(Boolean);
@@ -481,11 +531,15 @@ function applyFilters(){
     const favoriteOK=!showFavoritesOnly || favorites.has(p.id);
     const hay=buildSearchText(p);
     const queryOK=!terms.length || terms.every(term=>hay.includes(term));
-    return categoryOK && favoriteOK && passesQuickFilters(p) && queryOK;
+    return categoryOK && favoriteOK && passesQuickFilters(p) && passesMobilitySubtype(p) && queryOK;
   });
   items=sortItems(items);
 
   if(showFavoritesOnly) titleEl.textContent='お気に入り';
+  else if(activeCategory==='mobility' && mobilitySubtype!=='all'){
+    const names={rail:'鉄道駅',bus:'バス',taxi:'タクシー'};
+    titleEl.textContent=`移動する・${names[mobilitySubtype] || ''}`;
+  }
   else if(activeCategory) titleEl.textContent=categoryMap[activeCategory].name;
   else if(raw) titleEl.textContent=`「${raw}」の検索結果`;
   else titleEl.textContent=mode==='resident'?'市民向けおすすめ':'観光向けおすすめ';
@@ -549,6 +603,29 @@ document.getElementById('clearFiltersButton').addEventListener('click',()=>{
   activeFilters.clear();
   updateFilterUI();
   applyFilters();
+});
+
+
+mobilityTools.addEventListener('click',e=>{
+  const btn=e.target.closest('button[data-mobility]');
+  if(!btn) return;
+  mobilitySubtype=btn.dataset.mobility || 'all';
+  updateMobilityTools();
+  applyFilters();
+  document.getElementById('resultsSection').scrollIntoView({behavior:'smooth',block:'start'});
+});
+
+mobilityNearbyButton.addEventListener('click',()=>{
+  sortMode='nearby';
+  sortSelect.value='nearby';
+  localStorage.setItem('fujinomiya-sort',sortMode);
+  if(!userLocation){
+    statusEl.textContent='現在地を取得して、移動情報を近い順に並べ替えます…';
+    locate();
+  }else{
+    statusEl.textContent='移動情報を現在地から近い順に並べ替えました。';
+    applyFilters();
+  }
 });
 
 sortSelect.value=sortMode;
@@ -637,6 +714,7 @@ async function boot(){
   updateFilterUI();
   await loadRemotePlaces();
   renderCategories();
+updateMobilityTools();
   renderDataSummary();
   applyFilters();
 }

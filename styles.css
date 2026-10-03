@@ -179,6 +179,122 @@ footer{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;color:
 }
 
 
+/* v13: 富士宮フォトホーム（カテゴリー別写真） */
+.hero{
+  background-image:
+    linear-gradient(90deg,rgba(7,49,40,.78) 0%,rgba(7,49,40,.54) 46%,rgba(7,49,40,.20) 72%,rgba(7,49,40,.08) 100%),
+    url("富士宮市を巡る旅ガイド.png");
+  background-size:cover;
+  background-position:center 54%;
+  background-repeat:no-repeat;
+  min-height:330px;
+}
+.hero:before{
+  z-index:0;
+  background:
+    linear-gradient(180deg,rgba(0,0,0,.02) 0%,rgba(0,0,0,.08) 52%,rgba(0,0,0,.30) 100%),
+    radial-gradient(circle at 82% 12%,rgba(255,255,255,.16),transparent 34%);
+}
+.hero-copy{text-shadow:0 2px 16px rgba(0,0,0,.35)}
+.hero-badge{background:rgba(255,255,255,.20);box-shadow:0 6px 20px rgba(0,0,0,.10)}
+.mountain{display:none}
+
+.category-card{
+  --cat-image:none;
+  min-height:154px;
+  padding:16px 14px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  color:#fff;
+  border:1px solid rgba(255,255,255,.55);
+  background-color:#315d50;
+  background-image:
+    linear-gradient(180deg,rgba(6,39,32,.03) 0%,rgba(6,39,32,.07) 43%,rgba(4,34,28,.78) 100%),
+    var(--cat-image);
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  box-shadow:0 12px 28px rgba(23,64,53,.14);
+}
+.category-card:hover{
+  background-image:
+    linear-gradient(180deg,rgba(6,39,32,.00) 0%,rgba(6,39,32,.05) 40%,rgba(4,34,28,.72) 100%),
+    var(--cat-image);
+  border-color:rgba(255,255,255,.85);
+  color:#fff;
+}
+.category-card.active{
+  background-color:#234f42;
+  background-image:
+    linear-gradient(180deg,rgba(8,97,70,.18) 0%,rgba(8,97,70,.24) 42%,rgba(3,50,37,.88) 100%),
+    var(--cat-image);
+  border-color:rgba(255,255,255,.9);
+  color:#fff;
+  box-shadow:0 0 0 3px rgba(10,91,70,.18),0 14px 30px rgba(23,64,53,.18);
+}
+.category-card .icon{display:none}
+.category-card .name{
+  position:relative;
+  z-index:2;
+  color:#fff;
+  font-size:15px;
+  font-weight:950;
+  line-height:1.28;
+  text-shadow:0 2px 10px rgba(0,0,0,.62);
+}
+.cat-count{
+  z-index:3;
+  right:10px;
+  top:10px;
+  font-size:10px;
+  color:#274d42;
+  background:rgba(255,255,255,.88);
+  border:1px solid rgba(255,255,255,.60);
+  backdrop-filter:blur(8px);
+  box-shadow:0 5px 14px rgba(0,0,0,.08);
+}
+.category-card.active .cat-count{
+  color:#194c3b;
+  background:rgba(255,255,255,.92);
+}
+
+.category-card:nth-child(1){--cat-image:url("富士山を望む焼きそばの昼下がり.png");background-position:center}
+.category-card:nth-child(2){--cat-image:url("富士山と朱色の神社_桜の絶景.png");background-position:center}
+.category-card:nth-child(3){--cat-image:url("富士山を望む春の市場風景.png");background-position:center}
+.category-card:nth-child(4){--cat-image:url("富士山を望む夕暮れの露天風呂.png");background-position:center}
+.category-card:nth-child(5){--cat-image:url("富士山を望む駅前バス風景.png");background-position:center}
+.category-card:nth-child(6){--cat-image:url("春の富士山と静かな町並み.png");background-position:center}
+.category-card:nth-child(7){--cat-image:url("富士山を望む桜の遊び場.png");background-position:center}
+.category-card:nth-child(8){--cat-image:url("富士山を望む市庁舎の春景色.png");background-position:center}
+.category-card:nth-child(9){--cat-image:url("富士山を望む現代的なビジネス街.png");background-position:center}
+.category-card:nth-child(10){--cat-image:url("富士山を望む消防署と桜.png");background-position:center}
+.category-card:nth-child(11){--cat-image:url("富士山を望む夕暮れ祭りの街並み.png");background-position:center}
+.category-card:nth-child(12){--cat-image:url("富士山を望む春の市場通り.png");background-position:center}
+
+@media(max-width:680px){.filter-panel{padding:12px;border-radius:18px;margin-top:10px}.filter-head h2{font-size:17px}.filter-chips{gap:6px}.filter-chips button{padding:8px 9px;font-size:10px}}
+
+/* v7: 800+件向け 大量データ表示・並び替え・段階読込 */
+.results-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:-2px 0 12px;padding:9px 10px;border:1px solid var(--line);border-radius:14px;background:rgba(248,252,250,.92)}
+#resultsMeta{font-size:11px;color:var(--muted);font-weight:800}
+.sort-control{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted);font-weight:900}
+.sort-control select{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:10px;padding:8px 28px 8px 9px;font-size:11px;font-weight:800;outline:none}
+.sort-control select:focus{border-color:rgba(10,91,70,.4);box-shadow:0 0 0 3px rgba(10,91,70,.07)}
+.pagination{display:flex;align-items:center;justify-content:center;gap:10px;margin:18px auto 4px;flex-wrap:wrap}
+.page-btn{min-width:132px;border:1px solid var(--green);background:#fff;color:var(--green);border-radius:14px;padding:12px 14px;font-size:13px;font-weight:900}
+.page-btn:active:not(:disabled){background:var(--green3)}
+.page-btn:disabled{opacity:.38;cursor:not-allowed;background:#f5f8f6}
+.page-indicator{min-width:78px;text-align:center;font-size:13px;font-weight:900;color:var(--ink);padding:10px 8px;border-radius:12px;background:var(--green3)}
+@media(max-width:680px){
+  .results-toolbar{align-items:flex-start;flex-direction:column;padding:9px}
+  .sort-control{width:100%;justify-content:space-between}
+  .sort-control select{min-width:170px}
+  .page-btn{min-width:118px;font-size:12px;padding:11px 12px}
+  .page-indicator{font-size:12px}
+}
+
+
 /* v8: 富士宮フォトホーム */
 .hero{
   background-image:
@@ -285,4 +401,62 @@ footer{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;color:
 @media(min-width:1051px){
   .category-card{min-height:170px}
   .category-card .name{font-size:16px}
+}
+
+
+/* v12: 移動する専用ツール */
+.mobility-tools{
+  margin:12px 0 16px;
+  padding:12px;
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:linear-gradient(180deg,rgba(236,247,243,.95),rgba(255,255,255,.96));
+}
+.mobility-tools[hidden]{display:none!important}
+.mobility-tools-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
+  color:var(--ink);
+  font-size:13px;
+}
+.mobility-nearby-btn{
+  border:1px solid var(--green);
+  background:#fff;
+  color:var(--green);
+  border-radius:999px;
+  padding:9px 12px;
+  font-size:12px;
+  font-weight:900;
+}
+.mobility-subfilters{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+}
+.mobility-subfilters button{
+  border:1px solid var(--line);
+  background:#fff;
+  color:var(--ink);
+  border-radius:12px;
+  padding:10px 8px;
+  font-size:12px;
+  font-weight:900;
+}
+.mobility-subfilters button span{
+  display:inline-block;
+  margin-left:3px;
+  opacity:.7;
+}
+.mobility-subfilters button.active{
+  background:var(--green);
+  color:#fff;
+  border-color:var(--green);
+}
+@media(max-width:640px){
+  .mobility-tools-head{align-items:flex-start;flex-direction:column}
+  .mobility-nearby-btn{width:100%}
+  .mobility-subfilters{grid-template-columns:repeat(2,minmax(0,1fr))}
 }

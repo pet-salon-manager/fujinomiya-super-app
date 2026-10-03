@@ -13,7 +13,7 @@
   <title>富士宮まるごと | FUJINOMIYA ONE</title>
   <link rel="preconnect" href="https://unpkg.com" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=20261003-v10" />
+  <link rel="stylesheet" href="styles.css?v=20261003-v13" />
 </head>
 <body>
   <div class="app-shell" id="home">
@@ -115,6 +115,18 @@
               </select>
             </label>
           </div>
+          <div id="mobilityTools" class="mobility-tools" hidden>
+            <div class="mobility-tools-head">
+              <strong>移動手段で絞り込み</strong>
+              <button id="mobilityNearbyButton" class="mobility-nearby-btn" type="button">📍 現在地から近い順</button>
+            </div>
+            <div class="mobility-subfilters" role="group" aria-label="移動手段">
+              <button type="button" data-mobility="all" class="active">すべて <span id="mobilityCountAll">0</span></button>
+              <button type="button" data-mobility="rail">🚉 鉄道駅 <span id="mobilityCountRail">0</span></button>
+              <button type="button" data-mobility="bus">🚌 バス <span id="mobilityCountBus">0</span></button>
+              <button type="button" data-mobility="taxi">🚕 タクシー <span id="mobilityCountTaxi">0</span></button>
+            </div>
+          </div>
           <div id="cards" class="cards"></div>
           <div id="pagination" class="pagination" hidden>
             <button id="prevPageButton" class="page-btn" type="button">← 前のページ</button>
@@ -179,6 +191,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js?v=20261003-v9"></script>
   <script src="data.js?v=20261003-v9"></script>
-  <script src="app-live.js?v=20261003-v10"></script>
+  <script src="app-live.js?v=20261003-v13"></script>
 </body>
 </html>
