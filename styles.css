@@ -653,3 +653,66 @@ body:before{
   .status{display:none}
   .results-panel,.map-panel{border-radius:22px}
 }
+
+
+/* v18: approved category-card artwork + simplified hero */
+.hero-cta,.hero-dots{display:none!important}
+
+/* These five approved images already contain their icon, label, arrow and count badge.
+   Hide the live overlay to avoid duplicate text while keeping the cards clickable. */
+.category-card:nth-child(1),
+.category-card:nth-child(8),
+.category-card:nth-child(9),
+.category-card:nth-child(11),
+.category-card:nth-child(12){
+  padding:0!important;
+  background-image:var(--cat-image)!important;
+  background-size:cover!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
+  border-color:rgba(255,255,255,.86)!important;
+}
+.category-card:nth-child(1):hover,
+.category-card:nth-child(8):hover,
+.category-card:nth-child(9):hover,
+.category-card:nth-child(11):hover,
+.category-card:nth-child(12):hover,
+.category-card:nth-child(1).active,
+.category-card:nth-child(8).active,
+.category-card:nth-child(9).active,
+.category-card:nth-child(11).active,
+.category-card:nth-child(12).active{
+  background-image:var(--cat-image)!important;
+}
+.category-card:nth-child(1) .icon,
+.category-card:nth-child(1) .name,
+.category-card:nth-child(1) .cat-count,
+.category-card:nth-child(8) .icon,
+.category-card:nth-child(8) .name,
+.category-card:nth-child(8) .cat-count,
+.category-card:nth-child(9) .icon,
+.category-card:nth-child(9) .name,
+.category-card:nth-child(9) .cat-count,
+.category-card:nth-child(11) .icon,
+.category-card:nth-child(11) .name,
+.category-card:nth-child(11) .cat-count,
+.category-card:nth-child(12) .icon,
+.category-card:nth-child(12) .name,
+.category-card:nth-child(12) .cat-count{
+  display:none!important;
+}
+.category-card:nth-child(1):before,
+.category-card:nth-child(8):before,
+.category-card:nth-child(9):before,
+.category-card:nth-child(11):before,
+.category-card:nth-child(12):before{
+  inset:5px;
+  border-color:rgba(255,255,255,.28);
+}
+@media(max-width:680px){
+  .category-card:nth-child(1),
+  .category-card:nth-child(8),
+  .category-card:nth-child(9),
+  .category-card:nth-child(11),
+  .category-card:nth-child(12){min-height:116px!important}
+}
